@@ -1,39 +1,6 @@
-# Sugestão de Alocação do Time
+# Alocação do Time — Sprint 2
 
-Esta alocação foi pensada para 2 estagiários de frontend e 2 estagiários de backend, equilibrando entrega com aprendizado.
-
-## Alocação da Sprint 1
-
-**Nota de contexto histórico**
-
-- A alocação da Sprint 1 preserva os cards do recorte original.
-- Ela não deve ser reinterpretada retroativamente pela modelagem baseada em [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
-- Nenhuma distribuição da Sprint 1 nesta página deve ser lida como dependente da modelagem posterior de revisão de termos.
-
-### Estagiário de Back-end A
-
-- `S1-C01` — Consolidar regras de validação do TCE no backend
-
-### Estagiário de Back-end B
-
-- `S1-C02` — Refinar contrato do endpoint de criação de TCE
-
-### Estagiário de Front-end A
-
-- `S1-C03` — Implementar estrutura do Step Modal de TCE
-
-### Estagiário de Front-end B
-
-- `S1-C05` — Exibir indicador de estágio ativo na UI
-- `S1-C06` — Corrigir inconsistências de renderização em detalhe/lista de estágio
-
-### Handoff conjunto
-
-- `S1-C04` — Integrar Step Modal de TCE com o fluxo de criação no backend
-  - Responsável principal: Estagiário de Front-end A
-  - Apoio: Estagiário de Back-end B
-
-## Alocação da Sprint 2
+## Distribuição sugerida
 
 ### Estagiário de Back-end A
 

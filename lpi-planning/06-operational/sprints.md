@@ -1,4 +1,15 @@
-# Decomposição de Sprints
+# Índice Operacional de Sprints
+
+## Propósito
+
+Este arquivo funciona como índice da camada operacional.
+
+Cada sprint possui agora seu próprio diretório com os seguintes arquivos:
+
+- [`description.md`](lpi-planning/06-operational/sprint-1/description.md)
+- [`stories.md`](lpi-planning/06-operational/sprint-1/stories.md)
+- [`cards.md`](lpi-planning/06-operational/sprint-1/cards.md)
+- [`team-allocation.md`](lpi-planning/06-operational/sprint-1/team-allocation.md)
 
 ## Modelo de entrega
 
@@ -6,81 +17,33 @@
 - Time: 2 estagiários de frontend + 2 estagiários de backend
 - Princípio: estrutura leve, escopo fechado de sprint, entrega útil e execução orientada a aprendizado
 
-## Sprint 1 — Escopo fechado já definido
+## Sprints disponíveis
 
-**Nota de contexto histórico**
+### Sprint 1
 
-- A Sprint 1 é preservada conforme o escopo original definido à época.
-- Ela antecede a introdução de [`InternshipTerm`](lpi-planning/01-entities/internship-term.md) como modelagem oficial.
-- Qualquer conexão com o modelo novo deve ser lida apenas como contexto posterior, não como reinterpretação retroativa da sprint.
+- Diretório: [`lpi-planning/06-operational/sprint-1/`](lpi-planning/06-operational/sprint-1)
+- Descrição: [`lpi-planning/06-operational/sprint-1/description.md`](lpi-planning/06-operational/sprint-1/description.md)
+- Histórias: [`lpi-planning/06-operational/sprint-1/stories.md`](lpi-planning/06-operational/sprint-1/stories.md)
+- Cards: [`lpi-planning/06-operational/sprint-1/cards.md`](lpi-planning/06-operational/sprint-1/cards.md)
+- Alocação: [`lpi-planning/06-operational/sprint-1/team-allocation.md`](lpi-planning/06-operational/sprint-1/team-allocation.md)
 
-### Objetivo
+### Sprint 2
 
-Fechar o fluxo de TCE de forma robusta, validando regras e melhorando a UX com Step Modal.
+- Diretório: [`lpi-planning/06-operational/sprint-2/`](lpi-planning/06-operational/sprint-2)
+- Descrição: [`lpi-planning/06-operational/sprint-2/description.md`](lpi-planning/06-operational/sprint-2/description.md)
+- Histórias: [`lpi-planning/06-operational/sprint-2/stories.md`](lpi-planning/06-operational/sprint-2/stories.md)
+- Cards: [`lpi-planning/06-operational/sprint-2/cards.md`](lpi-planning/06-operational/sprint-2/cards.md)
+- Alocação: [`lpi-planning/06-operational/sprint-2/team-allocation.md`](lpi-planning/06-operational/sprint-2/team-allocation.md)
 
-### Histórias incluídas
-
-- `S1-US-01` — Criar estágio pelo fluxo de TCE
-- `S1-US-02` — Guiar o preenchimento do TCE com Step Modal
-- `S1-US-03` — Exibir indicativo de estágio ativo com consistência
-- `S1-US-04` — Corrigir inconsistências na exibição de dados do estágio
-
-### Ordem sugerida de execução
-
-1. Consolidação de validações de TCE no backend
-2. Refinamento do contrato de payload/resposta do TCE no backend
-3. Estrutura do Step Modal no frontend
-4. Integração do frontend com o fluxo de criação no backend
-5. Indicador de ativo e correções de renderização
-
-### Riscos
-
-- O comportamento de validação pode expor inconsistências escondidas no tratamento antigo de estágio
-- O custo de interação no frontend pode superar a estimativa inicial
-
-## Sprint 2 — Escopo fechado já definido
-
-### Objetivo
-
-Expandir o fluxo de estágio com aditivo baseado em novo termo e estruturar agentes integradores no modelo atualizado.
-
-### Histórias incluídas
-
-- `S2-US-01` — Registrar aditivo criando novo termo de estágio
-- `S2-US-02` — Gerenciar agentes integradores
-- `S2-US-03` — Associar agente integrador opcional no TCE
-
-### Itens explicitamente excluídos
-
-- Fluxo de rescisão
-- Edição contratual genérica por snapshot fora do caso formal de aditivo
-- Exportação CSV
-- Dashboards
-
-### Ordem sugerida de execução
-
-1. Operação de aditivo no backend
-2. Persistência e regras de seleção de agente integrador no backend
-3. Fluxo de aditivo no frontend
-4. Gerenciamento de agente integrador no frontend
-5. Integração do TCE com seleção opcional de agente integrador
-
-### Riscos
-
-- A consolidação de soft delete pode expor inconsistência legada
-- A integração do TCE pode ser bloqueada se o comportamento de listagem de agente integrador não estiver estabilizado antes
-
-## Depois da Sprint 2
-
-### Próxima trilha recomendada
+## Trilha posterior recomendada
 
 - Fluxo de rescisão
 - Fluxo de edição contratual por snapshot fora do aditivo formal
 - Consolidação do modelo de soft delete nas entidades restantes
 
-### Itens que não devem ser puxados cedo
+## Itens que não devem ser puxados cedo
 
 - Exportação CSV
 - Dashboards
 
-Esses itens já são tratados como pós-MVP.
+Esses itens continuam tratados como pós-MVP.
