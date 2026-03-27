@@ -7,6 +7,12 @@ Esta sprint é preservada conforme o escopo original definido à época.
 - Ela antecede a introdução de [`InternshipTerm`](lpi-planning/01-entities/internship-term.md) como modelagem oficial.
 - O conteúdo desta pasta não deve ser reinterpretado retroativamente pelo modelo posterior.
 
+## Observação posterior de escopo
+
+- As decisões finais posteriores mantêm esta sprint como registro histórico.
+- Na implementação atual, `AgentIntegrator` ficou fora de escopo e `placementAgency` permanece como legado transitório.
+- O fluxo de aditivo também ficou fora do escopo da sprint atual de implementação, permanecendo apenas como preparação estrutural futura.
+
 ## Objetivo
 
 Fechar o fluxo de TCE de forma robusta, validando regras e melhorando a UX com Step Modal.

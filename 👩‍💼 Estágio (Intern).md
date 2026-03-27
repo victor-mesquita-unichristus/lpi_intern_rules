@@ -1,93 +1,63 @@
 # 👩‍💼 Estágio (Intern)
 
-## Estrutura e vínculo
+## Propósito
 
-- Cada estágio deve estar vinculado a um aluno, uma empresa e um supervisor existentes.
-- O supervisor precisa pertencer à mesma empresa do estágio.
+`Internship` representa a identidade persistida do vínculo de estágio entre aluno e empresa.
 
-## Campos obrigatórios
+Ele não representa mais as condições contratuais variáveis do estágio.
 
+## Princípio central
+
+- `Internship` = identidade do vínculo
+- `InternshipTerm` = condições contratuais por período
+- O modelo é baseado em snapshots: mudanças contratuais geram novos termos, sem sobrescrever histórico
+
+## Campos
+
+- `id`
 - `studentId`
 - `companyId`
-- `supervisorId`
-- `isMandatory`
-- `internship_payment`
-- `working_hours`
-- `start_date`
-- `end_date`
-- `isActive`
+- `terminationDate` (`nullable`)
+- `createdAt`
+- `updatedAt`
+- `deletedAt` (`nullable`)
 
-## Campos opcionais
+## Regras estruturais
 
-- `placementAgency`
-- `amendment_start_date`
-- `amendment_end_date`
-- `termination_date`
-- `meal_allowance`
-- `transport_allowance`
+- Cada estágio pertence a um aluno existente.
+- Cada estágio pertence a uma empresa existente.
+- A empresa permanece fixa durante toda a vida do estágio.
+- `studentId` não pode ser alterado após a criação.
+- Conceitualmente não existe transferência de estágio entre alunos.
+- Se houver necessidade de mudança de empresa, o estágio atual deve ser encerrado e um novo estágio deve ser criado.
+- `Internship` não deve armazenar supervisor, `placementAgency`, datas contratuais, remuneração, carga horária nem campos de aditivo.
+- O estágio deve possuir ao menos um `InternshipTerm`, criado no TCE como termo inicial.
 
-## Validações numéricas
+## Relação com termo de estágio
 
-- Os valores numéricos `internship_payment`, `meal_allowance`, `transport_allowance` e `working_hours` devem ser positivos.
-- `working_hours` não pode ultrapassar 30 horas semanais.
+- A linha temporal contratual do estágio é formada exclusivamente pelos registros de `InternshipTerm` vinculados ao estágio.
+- Todos os termos do estágio pertencem ao mesmo vínculo entre aluno e empresa.
+- Não pode haver sobreposição entre termos válidos do mesmo estágio.
+- Um aluno não pode manter períodos de estágio sobrepostos, mesmo quando pertençam a estágios diferentes.
 
-## Datas e coerência temporal
+## Rescisão e ciclo de vida
 
-- A data de início (`start_date`) não pode ser futura em relação à data de criação do registro.
-- A data de término (`end_date`) precisa ser posterior à data de início.
-- Se o estágio for criado como ativo, `end_date` não pode estar no passado.
+- `terminationDate`, quando preenchido, representa a rescisão do estágio.
+- Nesta fase, a rescisão é definitiva.
+- Após a rescisão, o estágio é encerrado.
+- Um estágio rescindido preserva histórico.
+- Um estágio rescindido não pode receber novos termos.
+- Um estágio rescindido não pode receber revisão de termos.
+- A exclusão lógica usa `deletedAt` sem apagar histórico.
 
-### Regras para termo aditivo
+## Invariantes
 
-- `amendment_start_date` deve ser posterior a `end_date`.
-- `amendment_end_date` deve ser posterior a `amendment_start_date`.
+- A identidade do estágio permanece separada das condições contratuais.
+- A continuidade contratual é registrada exclusivamente em `InternshipTerm`.
+- A existência de termos não substitui a identidade do estágio.
+- `studentId` é imutável após a criação do vínculo.
+- `amendment_start_date` e `amendment_end_date` não fazem mais parte do domínio.
 
-### Regras para rescisão
+## Observação
 
-- `termination_date` não pode ser maior que a data atual.
-
-### Ordem temporal esperada
-
-```text
-start_date < end_date < amendment_start_date < amendment_end_date < termination_date <= now
-```
-
-Essa sequência deve ser respeitada quando os campos existirem.
-
-## Status e atividade
-
-- Um aluno só pode ter um estágio ativo por vez.
-- O status (`isActive`) é determinado automaticamente com base nas datas.
-
-### Um estágio é ativo se
-
-- `termination_date` não existe; e
-- `amendment_end_date` — ou `end_date`, se não houver aditivo — ainda não passou.
-
-### Um estágio é finalizado se
-
-- `termination_date` existe e é anterior à data atual; ou
-- `amendment_end_date`, se existir, é anterior à data atual; ou
-- `end_date` é anterior à data atual.
-
-### Comportamento automático
-
-- A atualização de status é automática, conforme a data atual do sistema.
-- Se um estágio atender aos critérios de término, mas ainda estiver marcado como ativo, o sistema deve corrigi-lo automaticamente.
-
-## Restrições adicionais
-
-- Um estágio não pode ter períodos sobrepostos com outro estágio, ativo ou inativo, do mesmo aluno.
-- Exemplo: um estágio que vai de janeiro a junho impede outro estágio do mesmo aluno que comece em março.
-- Não é permitido alterar aluno, empresa ou supervisor de um estágio já iniciado (`start_date <= now`).
-- Futuramente, poderá ser possível substituir o supervisor se o novo pertencer à mesma empresa.
-
-## Campos informativos
-
-- O campo `isMandatory` indica se o estágio é obrigatório, no sentido acadêmico.
-- Atualmente, ele não altera o comportamento do sistema, mas poderá influenciar requisitos como horas mínimas ou presença de agente de integração.
-
-## Exclusão
-
-- Só é permitido deletar o estágio se a data atual for maior que `end_date`, `amendment_end_date` e `termination_date`.
-- Só é permitido deletar o estágio se o usuário for `SUPERUSER`.
+- A compatibilidade temporária de contrato achatado na API não altera a separação estrutural entre vínculo e termo.

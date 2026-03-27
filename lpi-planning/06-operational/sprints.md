@@ -34,11 +34,13 @@ Cada sprint possui agora seu próprio diretório com os seguintes arquivos:
 - Histórias: [`lpi-planning/06-operational/sprint-2/stories.md`](lpi-planning/06-operational/sprint-2/stories.md)
 - Cards: [`lpi-planning/06-operational/sprint-2/cards.md`](lpi-planning/06-operational/sprint-2/cards.md)
 - Alocação: [`lpi-planning/06-operational/sprint-2/team-allocation.md`](lpi-planning/06-operational/sprint-2/team-allocation.md)
+- Enquadramento: sprint de refatoração estrutural do domínio de estágio, iniciada por testes de domínio, com fluxo de rescisão no backend e prototipação da nova visualização de estágio no frontend.
 
 ## Trilha posterior recomendada
 
-- Fluxo de rescisão
-- Fluxo de edição contratual por snapshot fora do aditivo formal
+- Fluxo operacional de aditivo
+- Histórico de termos visível na UI
+- Reabertura controlada de estágio rescindido, se vier a existir no produto
 - Consolidação do modelo de soft delete nas entidades restantes
 
 ## Itens que não devem ser puxados cedo

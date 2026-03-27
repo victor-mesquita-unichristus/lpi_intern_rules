@@ -5,6 +5,12 @@
 - Os cards desta sprint preservam o recorte operacional original.
 - Eles antecedem a introdução de [`InternshipTerm`](lpi-planning/01-entities/internship-term.md) como entidade do domínio.
 
+## Observação posterior de escopo
+
+- Estes cards não devem ser reinterpretados retroativamente como escopo obrigatório da implementação atual.
+- Na implementação atual, `AgentIntegrator` está fora de escopo e `placementAgency` permanece como legado transitório.
+- O fluxo de aditivo também não integra a sprint atual de implementação; apenas a preparação estrutural correspondente permanece relevante.
+
 ## Cards
 
 ### S1-C01 — Consolidar regras de validação do TCE no backend

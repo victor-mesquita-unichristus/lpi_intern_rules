@@ -25,7 +25,9 @@ Registrar a rescisão de um estágio.
 - Após a rescisão, não podem ser criados novos `InternshipTerm` para esse estágio.
 - Após a rescisão, não pode haver revisão de termos.
 - O fluxo não edita nem remove termos históricos já registrados.
-- `PENDENTE DE DECISÃO`: confirmar se existe política formal de reabertura após rescisão.
+- Nesta fase, a rescisão é definitiva.
+- Não existe fluxo de reabertura nesta implementação.
+- Eventual reversão futura, se existir, deve ser tratada como fluxo específico e controlado, fora do escopo atual.
 
 ## Pós-condições
 

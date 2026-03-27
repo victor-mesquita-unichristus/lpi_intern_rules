@@ -8,7 +8,6 @@ Definir a direção transversal de exclusão para registros persistidos no siste
 
 - `deletedAt` é o padrão preferencial transversal do sistema para exclusão lógica.
 - Entidades ainda não consolidadas nesse padrão devem ser tratadas como pendentes de migração ou consolidação.
-- Quando a consolidação de uma entidade ainda não estiver confirmada, a documentação deve marcar explicitamente `PENDENTE DE DECISÃO`.
 
 ## Regras canônicas
 
@@ -21,8 +20,8 @@ Definir a direção transversal de exclusão para registros persistidos no siste
 ## Estado atual de consolidação
 
 - Agente Integrador: confirmado com `deletedAt`.
-- `Internship`: `PENDENTE DE DECISÃO`.
-- `InternshipTerm`: `PENDENTE DE DECISÃO`.
+- `Internship`: confirmado com `deletedAt`.
+- `InternshipTerm`: confirmado com `deletedAt`.
 - Empresa: `PENDENTE DE DECISÃO`.
 - Aluno: `PENDENTE DE DECISÃO`.
 - Supervisor: `PENDENTE DE DECISÃO`.
@@ -34,8 +33,10 @@ Definir a direção transversal de exclusão para registros persistidos no siste
 - Listagens padrão devem ocultar registros com `deletedAt` preenchido.
 - Componentes de seleção não devem oferecer registros removidos logicamente.
 - Registros historicamente vinculados podem continuar aparecendo em telas de detalhe para auditoria e rastreabilidade.
+- Termos revisados não devem ser removidos logicamente apenas por terem perdido vigência.
+- Perda de vigência lógica por revisão não se confunde com `deletedAt`.
 
 ## Observação
 
-- A direção de soft delete não autoriza presumir que todas as entidades já estejam consolidadas com `deletedAt` hoje.
-- Onde essa consolidação não foi formalmente confirmada, a documentação deve permanecer marcada como `PENDENTE DE DECISÃO`.
+- `Internship` e `InternshipTerm` já estão consolidados neste padrão.
+- Onde a consolidação de outras entidades ainda não foi formalmente confirmada, a documentação deve permanecer marcada como `PENDENTE DE DECISÃO`.

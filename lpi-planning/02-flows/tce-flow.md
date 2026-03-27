@@ -18,7 +18,6 @@ No modelo atual, TCE significa a criação combinada de:
 - Aluno
 - Empresa
 - Supervisor
-- Agente Integrador
 
 ## Dados criados no fluxo
 
@@ -39,13 +38,12 @@ No modelo atual, TCE significa a criação combinada de:
 - `mealAllowance`
 - `transportAllowance`
 - `isMandatory`
-- `agentIntegratorId`
+- `placementAgency` (`nullable`, legado)
 
 ## Pré-condições
 
 - Aluno, empresa e supervisor já devem existir.
 - O supervisor deve pertencer à empresa selecionada para o estágio.
-- Se utilizado, o agente integrador já deve existir e estar ativo.
 - O usuário deve ter permissão para criar estágios.
 
 ## Regras específicas do fluxo
@@ -54,7 +52,8 @@ No modelo atual, TCE significa a criação combinada de:
 - O fluxo cria um novo `InternshipTerm` inicial vinculado ao estágio criado.
 - O fluxo usa as regras de domínio definidas em [`internship.md`](lpi-planning/01-entities/internship.md) e [`internship-term.md`](lpi-planning/01-entities/internship-term.md).
 - O fluxo não deve persistir TCE como entidade separada.
-- O fluxo não deve permitir entrada de agente integrador por texto livre.
+- Nesta fase, `placementAgency` pode ser informado como campo legado `string nullable` no termo.
+- `AgentIntegrator` não faz parte desta implementação.
 - Quaisquer mudanças futuras nas condições contratuais não devem editar esse termo inicial; devem gerar novo termo conforme o modelo de snapshot.
 
 ## Pós-condições
@@ -66,8 +65,8 @@ No modelo atual, TCE significa a criação combinada de:
 
 - O front-end usa Step Modal neste fluxo.
 - A UI deve guiar o usuário pela seleção de aluno, empresa, supervisor e dados contratuais do termo inicial.
-- A seleção opcional de agente integrador deve estar claramente indicada.
-- Agentes integradores inativos não devem aparecer no dropdown do TCE.
+- Nesta fase, o contrato principal pode permanecer achatado para criação e leitura principal, desde que o backend preserve internamente a separação entre vínculo e termo.
+- O histórico de termos pode ser exposto por endpoint adicional específico.
 
 ## Fora de escopo
 
