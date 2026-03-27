@@ -4,6 +4,11 @@ Este arquivo decompõe as histórias atuais das sprints em cards executáveis pa
 
 ## Cards da Sprint 1
 
+**Nota de contexto histórico**
+
+- Os cards da Sprint 1 preservam o recorte operacional original.
+- Eles antecedem a introdução de [`InternshipTerm`](lpi-planning/01-entities/internship-term.md) como entidade do domínio.
+
 ### S1-C01 — Consolidar regras de validação do TCE no backend
 
 - Tipo: Back-end
@@ -59,14 +64,14 @@ Este arquivo decompõe as histórias atuais das sprints em cards executáveis pa
 
 ## Cards da Sprint 2
 
-### S2-C01 — Implementar regras de aditivo no backend
+### S2-C01 — Implementar criação de termo de aditivo no backend
 
 - Tipo: Back-end
 - História: `S2-US-01`
 - Escopo:
-  - alterar apenas datas de aditivo
-  - validar comportamento permitido de aditivo
-  - persistir resultado consistente com o status
+  - criar novo `InternshipTerm` com `type = ADDENDUM`
+  - validar continuidade temporal
+  - preservar histórico sem sobrescrita
 
 ### S2-C02 — Expor operação de aditivo por endpoint/caso de uso dedicado
 
@@ -81,9 +86,9 @@ Este arquivo decompõe as histórias atuais das sprints em cards executáveis pa
 - Tipo: Front-end
 - História: `S2-US-01`
 - Escopo:
-  - renderizar apenas campos de aditivo
-  - bloquear campos que não pertencem ao aditivo
-  - exibir feedback de validação de datas
+  - renderizar campos do novo termo
+  - exibir histórico prévio como referência
+  - exibir feedback de validação de continuidade temporal
 
 ### S2-C04 — Implementar persistência de Agente Integrador e comportamento de soft delete
 
@@ -91,7 +96,7 @@ Este arquivo decompõe as histórias atuais das sprints em cards executáveis pa
 - História: `S2-US-02`
 - Escopo:
   - implementar regras de cadastro
-  - preservar vínculo histórico
+  - preservar vínculo histórico com termos
   - ocultar registros inativos nos casos de uso padrão de seleção
 
 ### S2-C05 — Construir telas de gerenciamento de Agente Integrador
@@ -108,7 +113,7 @@ Este arquivo decompõe as histórias atuais das sprints em cards executáveis pa
 - Tipo: Front-end
 - História: `S2-US-03`
 - Escopo:
-  - adicionar controle estruturado de seleção
+  - adicionar controle estruturado de seleção no termo inicial
   - impedir entrada por texto livre
   - excluir opções inativas
 
@@ -117,18 +122,24 @@ Este arquivo decompõe as histórias atuais das sprints em cards executáveis pa
 - Tipo: Back-end
 - História: `S2-US-03`
 - Escopo:
-  - aceitar `agentIntegratorId` opcional
+  - aceitar `agentIntegratorId` opcional em `InternshipTerm`
   - validar existência ativa antes da associação
 
 ## Cards pendentes que dependem de decisões ainda não resolvidas
 
-### PEND-C01 — Consolidar persistência de soft delete em estágio
+### PEND-C01 — Consolidar persistência de soft delete em `Internship` e `InternshipTerm`
 
 - Tipo: Back-end
 - Depende de: [`soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
 - Status: `PENDENTE DE DECISÃO`
 
-### PEND-C02 — Definir campos editáveis para manutenção de estágio antes do início
+### PEND-C02 — Definir campos não contratuais editáveis em `Internship`
+
+- Tipo: Produto + Back-end + Front-end
+- Depende de: [`edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
+- Status: `PENDENTE DE DECISÃO`
+
+### PEND-C03 — Definir fluxo operacional para edição contratual por snapshot fora do aditivo formal
 
 - Tipo: Produto + Back-end + Front-end
 - Depende de: [`edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)

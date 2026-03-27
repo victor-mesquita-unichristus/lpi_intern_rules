@@ -4,6 +4,12 @@ Este arquivo traduz o domínio consolidado em histórias reutilizáveis sem intr
 
 ## Histórias da Sprint 1
 
+**Nota de contexto histórico**
+
+- A Sprint 1 é preservada como registro do escopo definido à época.
+- Ela antecede a modelagem baseada em [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
+- Portanto, as histórias abaixo não devem ser reinterpretadas como fonte de verdade do modelo atual.
+
 ### S1-US-01 — Criar estágio pelo fluxo de TCE
 
 Como usuário administrativo, eu quero criar um estágio pelo fluxo de TCE para que o estágio seja formalmente registrado no sistema.
@@ -14,7 +20,6 @@ Como usuário administrativo, eu quero criar um estágio pelo fluxo de TCE para 
 - O usuário deve informar aluno, empresa, supervisor, carga horária, remuneração e período.
 - O supervisor selecionado deve pertencer à empresa selecionada.
 - O aluno selecionado não pode receber um período de estágio sobreposto.
-- O estágio é criado com comportamento de status consistente com [`internship.md`](lpi-planning/01-entities/internship.md).
 
 **Dependências**
 
@@ -68,25 +73,26 @@ Como usuário, eu quero que as informações do estágio sejam exibidas com cons
 
 ## Histórias da Sprint 2
 
-### S2-US-01 — Aplicar aditivo ao estágio
+### S2-US-01 — Registrar aditivo criando novo termo de estágio
 
-Como usuário administrativo, eu quero registrar um aditivo para um estágio para que o período de estágio possa ser estendido conforme o fluxo formal de aditivo.
+Como usuário administrativo, eu quero registrar um aditivo para um estágio para que as novas condições contratuais sejam armazenadas sem sobrescrever o histórico.
 
 **Critérios de aceite**
 
-- O fluxo de aditivo altera apenas `amendment_start_date` e `amendment_end_date`.
-- O fluxo não altera remuneração, empresa, aluno, supervisor nem outros dados-base do estágio.
-- As datas de aditivo devem respeitar as regras temporais definidas em [`internship.md`](lpi-planning/01-entities/internship.md).
-- O status resultante do estágio permanece consistente após o aditivo.
+- O fluxo de aditivo cria um novo `InternshipTerm` com `type = ADDENDUM`.
+- O fluxo não altera campos contratuais diretamente em `Internship`.
+- O termo anterior permanece imutável.
+- O novo termo deve respeitar continuidade temporal e não pode se sobrepor aos termos já existentes.
 
 **Dependências**
 
 - [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
+- [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
 - [`lpi-planning/02-flows/amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
 
 ### S2-US-02 — Gerenciar agentes integradores
 
-Como usuário administrativo, eu quero cadastrar e manter agentes integradores para que os estágios possam referenciá-los estruturalmente, em vez de texto livre.
+Como usuário administrativo, eu quero cadastrar e manter agentes integradores para que os termos de estágio possam referenciá-los estruturalmente, em vez de texto livre.
 
 **Critérios de aceite**
 
@@ -94,7 +100,7 @@ Como usuário administrativo, eu quero cadastrar e manter agentes integradores p
 - Nomes ativos são únicos.
 - A exclusão segue a direção de soft delete por meio de `deletedAt`.
 - Agentes integradores excluídos não aparecem em contextos padrão de seleção.
-- O detalhe histórico do estágio continua exibindo agentes integradores já vinculados.
+- O detalhe histórico continua exibindo agentes integradores já vinculados a termos existentes.
 
 **Dependências**
 
@@ -103,22 +109,24 @@ Como usuário administrativo, eu quero cadastrar e manter agentes integradores p
 
 ### S2-US-03 — Associar agente integrador opcional no TCE
 
-Como usuário administrativo, eu quero selecionar opcionalmente um agente integrador durante o TCE para que o estágio reflita a participação de intermediador quando ela existir.
+Como usuário administrativo, eu quero selecionar opcionalmente um agente integrador durante o TCE para que o termo inicial reflita a participação do intermediador quando ela existir.
 
 **Critérios de aceite**
 
 - A associação de agente integrador é opcional no TCE.
-- O fluxo armazena o relacionamento por meio de `agentIntegratorId`.
+- O fluxo armazena o relacionamento por meio de `agentIntegratorId` em `InternshipTerm`.
 - A seleção do TCE não mostra agentes integradores inativos.
 - Não é permitida entrada de agente integrador por texto livre.
 
 **Dependências**
 
 - [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
+- [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
 - [`lpi-planning/02-flows/tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
 
 ## Itens adiados fora do escopo definido das sprints
 
-- A implementação do fluxo de rescisão está fora do escopo da Sprint 2.
+- Fluxo de rescisão.
+- Fluxo operacional de edição contratual por snapshot fora do caso formal de aditivo.
 - Exportação CSV é pós-MVP.
 - Dashboards são pós-MVP.

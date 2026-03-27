@@ -8,6 +8,12 @@
 
 ## Sprint 1 — Escopo fechado já definido
 
+**Nota de contexto histórico**
+
+- A Sprint 1 é preservada conforme o escopo original definido à época.
+- Ela antecede a introdução de [`InternshipTerm`](lpi-planning/01-entities/internship-term.md) como modelagem oficial.
+- Qualquer conexão com o modelo novo deve ser lida apenas como contexto posterior, não como reinterpretação retroativa da sprint.
+
 ### Objetivo
 
 Fechar o fluxo de TCE de forma robusta, validando regras e melhorando a UX com Step Modal.
@@ -29,24 +35,25 @@ Fechar o fluxo de TCE de forma robusta, validando regras e melhorando a UX com S
 
 ### Riscos
 
-- O custo de interação no frontend pode superar a estimativa inicial
 - O comportamento de validação pode expor inconsistências escondidas no tratamento antigo de estágio
+- O custo de interação no frontend pode superar a estimativa inicial
 
 ## Sprint 2 — Escopo fechado já definido
 
 ### Objetivo
 
-Expandir o fluxo de estágio com Aditivo e estruturar Agentes Integradores.
+Expandir o fluxo de estágio com aditivo baseado em novo termo e estruturar agentes integradores no modelo atualizado.
 
 ### Histórias incluídas
 
-- `S2-US-01` — Aplicar aditivo ao estágio
+- `S2-US-01` — Registrar aditivo criando novo termo de estágio
 - `S2-US-02` — Gerenciar agentes integradores
 - `S2-US-03` — Associar agente integrador opcional no TCE
 
 ### Itens explicitamente excluídos
 
 - Fluxo de rescisão
+- Edição contratual genérica por snapshot fora do caso formal de aditivo
 - Exportação CSV
 - Dashboards
 
@@ -68,7 +75,7 @@ Expandir o fluxo de estágio com Aditivo e estruturar Agentes Integradores.
 ### Próxima trilha recomendada
 
 - Fluxo de rescisão
-- Consolidação da edição genérica de estágio
+- Fluxo de edição contratual por snapshot fora do aditivo formal
 - Consolidação do modelo de soft delete nas entidades restantes
 
 ### Itens que não devem ser puxados cedo

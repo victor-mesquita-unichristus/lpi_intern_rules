@@ -2,208 +2,121 @@
 
 ## Escopo deste diagnóstico
 
-Este diagnóstico revisa a estrutura atual de planejamento em [`lpi-planning/`](lpi-planning), com prioridade para:
+Este diagnóstico audita a consistência do planejamento em [`lpi-planning/`](lpi-planning) após a adoção da nova modelagem oficial de domínio.
+
+Arquivos centrais revisados nesta consolidação:
 
 - [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
+- [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
+- [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
 - [`lpi-planning/02-flows/tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
 - [`lpi-planning/02-flows/amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
+- [`lpi-planning/02-flows/edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
 - [`lpi-planning/02-flows/termination-flow.md`](lpi-planning/02-flows/termination-flow.md)
 - [`lpi-planning/03-cross-cutting/soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
-- [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
+- [`lpi-planning/06-operational/stories.md`](lpi-planning/06-operational/stories.md)
+- [`lpi-planning/06-operational/cards.md`](lpi-planning/06-operational/cards.md)
+- [`lpi-planning/06-operational/sprints.md`](lpi-planning/06-operational/sprints.md)
+- [`lpi-planning/06-operational/team-allocation.md`](lpi-planning/06-operational/team-allocation.md)
 
-O objetivo não é criar novo comportamento de produto, mas identificar o que já está consolidado, o que está inconsistente e o que ainda depende de decisão.
+O objetivo é identificar o que foi consolidado, o que ainda apresenta fragilidade de interpretação e o que permanece sem decisão formal.
 
-## Arquivos que já estão em boa direção
+## Mudanças consolidadas
 
-### Bons ou majoritariamente bons
+### Estrutura do domínio de estágio
 
-- [`lpi-planning/01-entities/company.md`](lpi-planning/01-entities/company.md)
-  - Está corretamente posicionado como verdade da entidade.
-  - Está majoritariamente consistente com o material-base atual.
+- `Internship` continua sendo a entidade principal do sistema.
+- `Internship` representa a identidade do vínculo entre aluno e empresa.
+- `terminationDate` permanece em `Internship` como parte do ciclo de vida do estágio.
+- `InternshipTerm` passa a representar as condições contratuais por período.
+- Supervisor e agente integrador pertencem ao termo, não ao estágio.
+- Dados contratuais não devem mais existir diretamente em `Internship`.
+- O domínio agora é baseado em snapshots.
+- Alterações de condição não sobrescrevem o termo atual.
+- Alterações de condição devem gerar novo `InternshipTerm`.
+- Revisão de termo não cria novo `type`; mantém `INITIAL` ou `ADDENDUM` e usa `revisedFromTermId` como vínculo de revisão.
 
-- [`lpi-planning/01-entities/supervisor.md`](lpi-planning/01-entities/supervisor.md)
-  - Está corretamente focado em regras persistentes de negócio.
-  - O relacionamento com empresa está documentado na camada correta.
+### Remoção do modelo antigo de aditivo em `Internship`
 
-- [`lpi-planning/01-entities/student.md`](lpi-planning/01-entities/student.md)
-  - Está focado em entidade e é útil operacionalmente.
-  - Precisa apenas de cuidado pontual com a regra de sobreposição, pois ela é efetivamente garantida pelo comportamento de estágio.
+- `amendment_start_date` e `amendment_end_date` deixaram de fazer parte do modelo consolidado.
+- Aditivo agora é documentado como criação de novo `InternshipTerm` com `type = ADDENDUM`.
 
-- [`lpi-planning/02-flows/edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
-  - Já está separado de aditivo e rescisão.
-  - A direção está correta.
+### Reposicionamento de supervisor e agente integrador
 
-## Arquivos com inconsistência ou consolidação fraca
+- O supervisor pertence a `InternshipTerm`.
+- A regra válida é: o supervisor do termo deve pertencer à empresa do estágio.
+- O agente integrador pertence a `InternshipTerm`.
+- Continua proibido texto livre.
+- Histórico deve ser preservado mesmo se o integrador ficar inativo.
 
-### [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
+### Reposicionamento dos fluxos principais
 
-Status: parcialmente correto, mas ainda precisa de consolidação.
+- TCE não é entidade persistida separada.
+- TCE cria um `Internship` e um `InternshipTerm` inicial.
+- Edição contratual não sobrescreve termo existente.
+- Edição contratual deve gerar novo snapshot em `InternshipTerm`.
+- Mudança de empresa não é edição do estágio; exige encerramento e criação de outro estágio.
+- Rescisão em `Internship` impede criação e revisão de termos.
 
-Problemas encontrados:
+### Material operacional futuro ajustado ao modelo novo
 
-- Coloca corretamente `Estágio` no centro do sistema.
-- Já separa aditivo e rescisão como fluxos, o que está alinhado.
-- Introduz `deletedAt` como se já estivesse consolidado para estágio, mas a base histórica atual explicita apenas restrições de exclusão, enquanto a nova direção diz que soft delete deve ser global sempre que possível.
-- Por causa disso, o modelo de soft delete para estágio ainda não está totalmente consolidado e precisa ser documentado com cuidado para não transformar uma direção desejada em verdade atual falsa.
-- A coerência temporal está resumida demais. O material-fonte antigo traz regras mais concretas de ordenação temporal que devem permanecer como verdade da entidade.
-- `isActive` aparece como estado derivado, o que é consistente com o conjunto antigo de regras, mas a redação final precisa evitar inferir detalhes de implementação ainda não confirmados além do comportamento de negócio.
+- A Sprint 2 e o planejamento posterior já podem refletir a modelagem com [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
+- A Sprint 1 foi preservada como registro histórico do escopo original e não deve ser lida como reescrita retroativa do novo modelo.
 
-Conclusão:
+## Riscos e fragilidades remanescentes
 
-- Boa base.
-- Precisa consolidar melhor as regras temporais.
-- Precisa distinguir explicitamente verdade atual de direção de soft delete.
+### [`tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
 
-### [`lpi-planning/02-flows/tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
+- O enquadramento atual está correto, mas depende de leitura disciplinada em conjunto com [`internship.md`](lpi-planning/01-entities/internship.md) e [`internship-term.md`](lpi-planning/01-entities/internship-term.md).
+- Se o time tratar o fluxo como fonte primária de regra temporal, há risco de voltar a misturar entidade e fluxo.
 
-Status: correto na direção, mas genérico demais.
+### [`amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
 
-Problemas encontrados:
+- O fluxo já está alinhado ao modelo de snapshot.
+- Ainda existe risco de implementação confundir aditivo formal com edição contratual genérica, porque ambos agora geram novos termos.
+- Esse risco aumentou com a introdução de `revisedFromTermId`, porque a distinção entre revisão e aditivo depende de disciplina de fluxo, não de um novo `type`.
 
-- Trata corretamente o TCE como criação de `Estágio`.
-- Já evita redefinir a maior parte das regras de domínio.
-- Ainda não conecta explicitamente o TCE à decisão de produto de que o próprio estágio é a formalização do TCE no MVP.
-- Diz que o front-end pode implementar Step Modal, mas a Sprint 1 já estabelece essa direção de forma mais forte.
-- Ainda falta explicitar que TCE não é uma entidade persistida separada.
+### [`edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
 
-Conclusão:
+- O enquadramento está mais correto, mas continua sensível a interpretação.
+- Sem definição operacional mais precisa, o time pode divergir sobre quando criar novo termo com o mesmo `type` e quando tratar a mudança como aditivo formal.
+- Também permanece sensível a erro de leitura sobre elegibilidade de revisão, porque a revisão só é permitida para o termo vigente.
 
-- Camada correta.
-- Precisa de enquadramento operacional mais preciso, não de novas regras.
+### [`termination-flow.md`](lpi-planning/02-flows/termination-flow.md)
 
-### [`lpi-planning/02-flows/amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
+- A regra central está clara.
+- Ainda há fragilidade caso implementação ou planejamento futuro tentem introduzir reabertura sem decisão formal, porque isso impactaria fluxo, invariantes e histórico.
 
-Status: majoritariamente correto, mas com um ponto assertivo demais.
+### [`soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
 
-Problemas encontrados:
+- A direção transversal ficou mais clara.
+- O ponto frágil remanescente é a baixa confirmação formal por entidade, o que ainda exige cuidado para não transformar direção em verdade implementada.
 
-- Afirma corretamente que aditivo é um fluxo dedicado sobre `Estágio`.
-- Limita corretamente os campos alterados a `amendment_start_date` e `amendment_end_date`.
-- Afirma atualmente que apenas um aditivo deve ser considerado no escopo do MVP.
-- Essa afirmação é compatível com a instrução mais recente, mas precisa ser escrita como escopo operacional, não como regra de domínio da entidade, salvo decisão explícita em definitivo.
+### [`internship-term.md`](lpi-planning/01-entities/internship-term.md)
 
-Conclusão:
+- O modelo de revisão ficou mais preciso com `revisedFromTermId`.
+- Ainda existe fragilidade de interpretação operacional sobre o que conta como termo válido em consultas e validações, porque isso depende da leitura conjunta de soft delete e substituição por revisão.
 
-- Muito próximo do alvo.
-- Precisa de ajuste de redação para permanecer na camada de fluxo.
+### Artefatos operacionais
 
-### [`lpi-planning/02-flows/termination-flow.md`](lpi-planning/02-flows/termination-flow.md)
+- O principal risco anterior era reescrever retroativamente a Sprint 1 com a modelagem nova.
+- Esse risco foi corrigido, mas precisa continuar explícito para evitar novas retrointerpretações do histórico do projeto.
+- O material operacional agora exige leitura temporal: Sprint 1 como registro histórico; Sprint 2 em diante como planejamento já influenciado pelo modelo novo.
 
-Status: majoritariamente correto, mas ainda um pouco orientado à implementação.
+## Pendências reais
 
-Problemas encontrados:
+Os pontos abaixo continuam sem decisão formal completa:
 
-- Trata corretamente a rescisão como fluxo dedicado.
-- Limita corretamente o campo alterado a `termination_date`, com efeito sistêmico sobre atividade.
-- A afirmação de que operações incompatíveis posteriores devem ser bloqueadas está correta na direção, mas ainda é ampla demais.
-- Sem enumeração explícita dessas operações bloqueadas, isso deve permanecer como nota controlada, não como nova regra escondida.
-
-Conclusão:
-
-- Boa estrutura.
-- Precisa de redação um pouco mais segura.
-
-### [`lpi-planning/03-cross-cutting/soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
-
-Status: inconsistente com a direção estratégica atual.
-
-Problemas encontrados:
-
-- Atualmente diz que soft delete se aplica a curso, agente integrador e futuras entidades administrativas.
-- A direção mais recente diz que a direção do sistema é soft delete global com `deletedAt` sempre que possível.
-- Portanto, o arquivo atual está estreito demais e ainda reflete uma visão local mais antiga.
-- Também mistura verdade atual com preferência futura sem distingui-las explicitamente.
-
-Conclusão:
-
-- Precisa ser consolidado.
-- Deve virar a regra transversal canônica para a direção de soft delete e para exceções conhecidas ou confirmações pendentes.
-
-### [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
-
-Status: bom, mas incompleto em relação às decisões consolidadas mais recentes do produto.
-
-Problemas encontrados:
-
-- Já cobre `name`, `deletedAt`, unicidade, relação opcional com estágio e preservação de histórico.
-- Ainda não explicita que agentes integradores inativos não devem aparecer no dropdown do TCE, o que é uma regra de produto confirmada.
-- Esse comportamento toca tanto entidade quanto fluxo: a verdade da entidade é que registros inativos não podem ser associados em novas operações; a verdade do fluxo TCE é que o dropdown não deve oferecê-los.
-
-Conclusão:
-
-- Boa base.
-- Precisa de separação mais clara entre verdade da entidade e uso operacional no TCE.
-
-## Arquivos que ainda misturam preocupações
-
-### Mistura leve entre entidade e fluxo
-
-- [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
-  - Menciona aditivo e rescisão como fluxos dedicados, o que é um contexto útil.
-  - Precisa de cuidado para não começar a descrever comportamento operacional além da verdade da entidade.
-
-- [`lpi-planning/01-entities/student.md`](lpi-planning/01-entities/student.md)
-  - A regra de sobreposição é, no fim, uma invariante de estágio. Mantê-la aqui é aceitável como consequência relacional, mas a fonte canônica deve permanecer em [`internship.md`](lpi-planning/01-entities/internship.md).
-
-## Regras do material antigo que conflitam com decisões recentes
-
-### Modelo de soft delete
-
-- Material antigo:
-  - Curso usa estado inativo.
-  - Agente Integrador usa `deletedAt`.
-  - Estágio tinha exclusão descrita por permissões e restrições de data, não claramente como soft delete.
-- Nova direção consolidada:
-  - Soft delete deve ser global com `deletedAt` sempre que possível.
-
-Status:
-
-- Existe conflito.
-- Precisa de consolidação com nota explícita quando algo ainda for apenas direção e não verdade plenamente confirmada no material anterior.
-
-### Nomeação do TCE
-
-- Tendência antiga:
-  - TCE pode ser interpretado como artefato de termo separado.
-- Nova decisão consolidada:
-  - O próprio `Estágio` é a formalização persistida do TCE no MVP.
-
-Status:
-
-- Precisa ficar explícito em [`tce-flow.md`](lpi-planning/02-flows/tce-flow.md) e ser respeitado em [`internship.md`](lpi-planning/01-entities/internship.md).
-
-### Aditivo e rescisão versus edição genérica
-
-- O material antigo já trazia campos separados de aditivo e rescisão em estágio.
-- A nova decisão reforça que aditivo e rescisão são fluxos dedicados, não edição genérica.
-
-Status:
-
-- Não há conflito real.
-- Precisa apenas de redação operacional mais limpa.
-
-## Pendências de decisão identificadas
-
-Os pontos abaixo não devem ser inventados e devem ser marcados explicitamente quando necessário:
-
-- `PENDENTE DE DECISÃO`: se `Estágio` já segue oficialmente `deletedAt` hoje ou se isso ainda é apenas a direção pretendida de consolidação.
-- `PENDENTE DE DECISÃO`: se `Empresa`, `Aluno`, `Supervisor` e `Usuário` também estão migrando para `deletedAt`, ou se alguns ainda permanecem com restrições de hard delete no MVP.
-- `PENDENTE DE DECISÃO`: se a edição de estágio pode alterar supervisor e empresa hoje, já que o contexto do produto diz “talvez supervisor, talvez empresa”, enquanto as regras antigas restringem alterações após início e não confirmam totalmente os cenários permitidos antes do início.
-- `PENDENTE DE DECISÃO`: se o limite de um aditivo por estágio é escopo definitivo do produto ou apenas escopo da implementação atual.
-
-## Ordem recomendada de saneamento
-
-1. Consolidar [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
-2. Refinar [`lpi-planning/02-flows/tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
-3. Refinar [`lpi-planning/02-flows/amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
-4. Refinar [`lpi-planning/02-flows/termination-flow.md`](lpi-planning/02-flows/termination-flow.md)
-5. Consolidar [`lpi-planning/03-cross-cutting/soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
-6. Refinar [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
+- `PENDENTE DE DECISÃO`: se `Internship` já usa oficialmente `deletedAt` no modelo persistido.
+- `PENDENTE DE DECISÃO`: se `InternshipTerm` já usa oficialmente `deletedAt` no modelo persistido.
+- `PENDENTE DE DECISÃO`: se Empresa, Aluno, Supervisor, Usuário e Curso já estão consolidados com `deletedAt`.
+- `PENDENTE DE DECISÃO`: se `studentId` pode ou não ser alterado após a criação de `Internship`.
+- `PENDENTE DE DECISÃO`: qual é o critério operacional para decidir quando uma alteração contratual fora do aditivo formal mantém o mesmo `type` no novo snapshot.
+- `PENDENTE DE DECISÃO`: se existe política oficial de reabertura após rescisão.
+- `PENDENTE DE DECISÃO`: se a revisão de termo exigirá justificativa obrigatória em versões futuras ou permanecerá opcional.
 
 ## Resumo do diagnóstico
 
-- O repositório já tem uma direção válida em três camadas.
-- O principal problema restante não é falta de estrutura, mas consolidação dos limites de verdade.
-- A maior inconsistência é o modelo de soft delete.
-- O alvo de saneamento com maior valor é [`internship.md`](lpi-planning/01-entities/internship.md), porque ele ancora todo o produto.
-- Os arquivos de fluxo já estão próximos do formato certo e precisam mais de precisão de redação do que de redesign.
+- A mudança estrutural principal foi consolidada.
+- O risco restante não está mais na direção do modelo, mas na disciplina de interpretação entre histórico do projeto, regras de entidade e fluxos operacionais.
+- As maiores fragilidades remanescentes estão em soft delete, edição contratual fora do aditivo formal e eventual política de reabertura após rescisão.

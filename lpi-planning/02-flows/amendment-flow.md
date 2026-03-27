@@ -2,41 +2,51 @@
 
 ## Objetivo do fluxo
 
-Aplicar um aditivo em um estágio existente.
+Registrar um aditivo em um estágio existente.
+
+No modelo atual, aditivo não altera diretamente o estágio nem sobrescreve o termo vigente.
+
+Aditivo significa a criação de um novo `InternshipTerm` com `type = ADDENDUM`.
 
 ## Entidades afetadas
 
-- Estágio
+- `Internship`
+- `InternshipTerm`
 
-## Campos alterados
+## Dados criados no fluxo
 
-- `amendment_start_date`
-- `amendment_end_date`
+- novo `InternshipTerm`
 
 ## Pré-condições
 
 - O estágio já deve existir.
 - O usuário deve ter permissão para editar estágios.
-- O estágio ainda deve estar elegível para aditivo conforme as regras de domínio.
+- O estágio não pode estar rescindido.
+- O novo termo deve respeitar a continuidade temporal do estágio.
+- O supervisor informado deve pertencer à empresa do estágio.
+- Se utilizado, o agente integrador deve existir e estar ativo.
 
 ## Regras específicas do fluxo
 
-- Este fluxo altera apenas as datas de aditivo.
-- O fluxo não altera remuneração, empresa, supervisor, aluno nem outros campos contratuais.
-- O fluxo consome as regras de coerência temporal definidas em [`internship.md`](lpi-planning/01-entities/internship.md).
-- O escopo operacional atual assume um aditivo por estágio.
-- `PENDENTE DE DECISÃO`: confirmar se o limite de um único aditivo é regra definitiva de produto ou apenas escopo da implementação atual.
+- O fluxo cria um novo `InternshipTerm` com `type = ADDENDUM`.
+- O fluxo não edita o termo atual.
+- O fluxo não edita campos de `Internship`.
+- O fluxo deve seguir as regras definidas em [`internship.md`](lpi-planning/01-entities/internship.md) e [`internship-term.md`](lpi-planning/01-entities/internship-term.md).
+- Não pode haver sobreposição entre o novo termo e termos anteriores do mesmo estágio.
+- O histórico existente deve permanecer imutável.
+- A empresa do estágio não muda neste fluxo.
+- O aluno do estágio não muda neste fluxo.
 
 ## Pós-condições
 
-- O estágio passa a armazenar as datas de aditivo de forma consistente.
-- O status do estágio é recalculado quando necessário.
+- Um novo termo do tipo `ADDENDUM` passa a existir para o estágio.
+- O histórico contratual do estágio é preservado sem sobrescrita.
 
 ## Comportamento esperado na UI
 
-- A UI deve expor apenas os campos relacionados a aditivo.
-- Campos que não pertencem ao aditivo devem permanecer bloqueados durante esta operação.
-- O usuário deve receber feedback claro de validação para datas de aditivo inválidas.
+- A UI deve expor os campos contratuais do novo termo.
+- Campos históricos já registrados devem ser exibidos como referência e não como edição do termo anterior.
+- O usuário deve receber feedback claro de validação para continuidade temporal inválida.
 
 ## Fora de escopo
 

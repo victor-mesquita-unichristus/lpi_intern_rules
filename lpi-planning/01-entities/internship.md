@@ -2,73 +2,81 @@
 
 ## Propósito
 
-Representa a entidade persistida central do sistema LPI.
+`Internship` continua sendo a entidade central do sistema LPI.
 
-No MVP, o próprio estágio é a formalização do TCE dentro do sistema. Não existe uma entidade persistida separada para TCE.
+Ela representa:
 
-## Campos relevantes
+- o vínculo entre aluno e empresa
+- a identidade do estágio
+- o ciclo de vida do estágio, incluindo rescisão
 
+## Princípio central
+
+- `Internship` representa a identidade do vínculo.
+- `InternshipTerm` representa as condições contratuais por período.
+- `Internship` não deve mais armazenar dados contratuais variáveis.
+
+## Papel no domínio
+
+- `Internship` é a entidade âncora do domínio de estágios.
+- É nela que o sistema reconhece a existência contínua do vínculo entre aluno e empresa.
+- Os termos contratuais podem mudar ao longo do tempo, mas continuam pertencendo ao mesmo `Internship` enquanto o vínculo permanecer o mesmo.
+- A separação entre vínculo e condições contratuais é estrutural, não apenas organizacional.
+- `Internship` concentra a identidade persistida que amarra aluno, empresa, termos válidos e rescisão dentro do mesmo ciclo de vida.
+
+## Campos
+
+- `id`
 - `studentId`
 - `companyId`
-- `supervisorId`
-- `agentIntegratorId`
-- `isMandatory`
-- `internship_payment`
-- `working_hours`
-- `start_date`
-- `end_date`
-- `amendment_start_date`
-- `amendment_end_date`
-- `termination_date`
-- `meal_allowance`
-- `transport_allowance`
-- `isActive`
+- `terminationDate` (`nullable`)
+- `createdAt`
+- `updatedAt`
+- `deletedAt` (`PENDENTE DE DECISÃO`: confirmar consolidação no modelo persistido)
 
-## Regras de cadastro
+## Regras
 
-- `studentId`, `companyId`, `supervisorId`, `isMandatory`, `internship_payment`, `working_hours`, `start_date` e `end_date` são obrigatórios.
-- Aluno, empresa e supervisor devem existir.
-- O supervisor deve pertencer à mesma empresa do estágio.
-- `agentIntegratorId` é opcional, mas, se informado, deve referenciar um agente integrador existente e ativo.
-- Valores numéricos devem ser positivos.
-- `working_hours` não pode ultrapassar 30 horas semanais.
-- `start_date` não pode ser futura no momento do cadastro.
-- `end_date` deve ser posterior a `start_date`.
-- Se o estágio for criado como ativo, `end_date` não pode estar no passado.
+- A empresa permanece fixa no estágio.
+- Se houver necessidade de mudar a empresa, o estágio atual deve ser encerrado e um novo estágio deve ser criado.
+- `Internship` não contém mais supervisor, agente integrador, datas contratuais, remuneração, carga horária nem campos de aditivo.
+- `terminationDate`, quando preenchido, representa a rescisão do estágio.
+- Após a rescisão, o estágio é encerrado e não pode receber novos termos.
+- A linha temporal contratual do estágio é formada pelo conjunto de termos válidos vinculados a ele.
+- A coerência temporal do estágio depende da ausência de sobreposição entre termos válidos do mesmo vínculo.
+- Um aluno não pode manter períodos de estágio sobrepostos, mesmo quando esses períodos pertençam a estágios diferentes.
 
-## Regras de edição
+## Ciclo de vida
 
-- Os dados do estágio podem ser editados apenas dentro das restrições de negócio permitidas.
-- `studentId`, `companyId` e `supervisorId` não podem ser alterados após o início do estágio.
-- Campos de aditivo e rescisão seguem fluxos operacionais próprios.
-- `PENDENTE DE DECISÃO`: quais campos-base do estágio podem ser alterados antes do início, especialmente empresa e supervisor.
-
-## Regras de exclusão
-
-- A exclusão só é permitida depois que todas as datas finais relevantes já tiverem passado.
-- A exclusão só é permitida para `SUPERUSER`.
-- A direção do sistema é alinhar a exclusão ao soft delete global com `deletedAt` sempre que possível.
-- `PENDENTE DE DECISÃO`: se `Estágio` já usa oficialmente `deletedAt` no modelo persistido ou se isso ainda é apenas um alvo de consolidação.
+- O estágio nasce como identidade persistida do vínculo entre aluno e empresa.
+- O TCE cria o estágio junto com o termo inicial.
+- A evolução contratual ocorre por novos registros em `InternshipTerm`.
+- A rescisão encerra o ciclo de vida do estágio sem apagar seu histórico.
+- Depois da rescisão, o estágio preserva histórico, mas não admite novos termos nem revisão de termos existentes.
 
 ## Relacionamentos
 
 - Um estágio pertence a um aluno.
 - Um estágio pertence a uma empresa.
-- Um estágio pertence a um supervisor.
-- Um estágio pode pertencer opcionalmente a um agente integrador.
+- Um estágio deve possuir ao menos um registro em `InternshipTerm`, criado no TCE como termo inicial.
+- Um estágio pode possuir termos adicionais ao longo do tempo, desde que respeitem a continuidade temporal e o estado do estágio.
 
 ## Invariantes
 
-- O supervisor sempre pertence à empresa do estágio.
-- Um aluno não pode ter períodos de estágio sobrepostos.
-- Um aluno pode ter apenas um estágio ativo por vez.
-- A coerência temporal deve ser preservada entre datas-base, datas de aditivo e data de rescisão.
-- Quando existirem, a ordem temporal esperada é `start_date < end_date < amendment_start_date < amendment_end_date < termination_date <= now`.
-- `termination_date` não pode ser maior que a data atual.
-- `isActive` é determinado pelas datas do estágio e pelo estado de rescisão.
+- `Internship` é a fonte da identidade do vínculo; `InternshipTerm` é a fonte das condições contratuais.
+- A identidade do estágio permanece separada das condições contratuais.
+- A continuidade contratual do estágio é registrada exclusivamente em `InternshipTerm`.
+- Não podem existir campos contratuais diretos em `Internship`.
+- A empresa é fixa durante toda a vida do estágio.
+- Todos os termos do estágio pertencem ao mesmo vínculo entre aluno e empresa.
+- Não pode haver sobreposição entre termos válidos do mesmo estágio.
+- Não pode haver sobreposição entre períodos de estágio do mesmo aluno no domínio, ainda que pertencentes a vínculos distintos.
+- Um estágio rescindido não pode receber novos termos.
+- Um estágio rescindido não pode receber revisão de termos.
+- A existência de termos não substitui nem redefine a identidade do estágio.
+- `amendment_start_date` e `amendment_end_date` não fazem mais parte do domínio.
 
-## Observações de MVP
+## Observações
 
-- `isMandatory` é informativo no MVP e ainda não altera o comportamento dos fluxos.
-- Aditivo e rescisão existem como fluxos operacionais dedicados, mas as regras de coerência temporal pertencem à verdade de domínio desta entidade.
-- Não existem entidades persistidas separadas para TCE, aditivo ou rescisão no MVP. Esses são fluxos operacionais sobre `Estágio`.
+- TCE não é entidade persistida separada.
+- No fluxo de TCE, o sistema cria um `Internship` e um `InternshipTerm` inicial.
+- `PENDENTE DE DECISÃO`: confirmar se `studentId` pode ou não ser alterado após a criação do estágio. A modelagem oficial consolidou explicitamente a imutabilidade da empresa, mas não formalizou este ponto para o aluno.

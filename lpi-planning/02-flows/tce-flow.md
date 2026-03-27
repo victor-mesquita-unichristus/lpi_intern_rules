@@ -4,54 +4,68 @@
 
 Criar um novo estágio por meio da operação de TCE.
 
-No MVP, TCE não é uma entidade persistida separada. O fluxo cria o próprio estágio.
+TCE não é uma entidade persistida separada.
+
+No modelo atual, TCE significa a criação combinada de:
+
+- um `Internship`
+- um `InternshipTerm` com `type = INITIAL`
 
 ## Entidades afetadas
 
-- Estágio
+- `Internship`
+- `InternshipTerm`
 - Aluno
 - Empresa
 - Supervisor
 - Agente Integrador
 
-## Campos alterados
+## Dados criados no fluxo
+
+### Em `Internship`
 
 - `studentId`
 - `companyId`
+- `terminationDate = null`
+
+### Em `InternshipTerm`
+
+- `type = INITIAL`
+- `startDate`
+- `endDate`
 - `supervisorId`
-- `agentIntegratorId`
+- `internshipPayment`
+- `workingHours`
+- `mealAllowance`
+- `transportAllowance`
 - `isMandatory`
-- `internship_payment`
-- `working_hours`
-- `start_date`
-- `end_date`
-- `meal_allowance`
-- `transport_allowance`
-- `isActive`
+- `agentIntegratorId`
 
 ## Pré-condições
 
 - Aluno, empresa e supervisor já devem existir.
-- Se utilizado, o agente integrador já deve existir.
+- O supervisor deve pertencer à empresa selecionada para o estágio.
+- Se utilizado, o agente integrador já deve existir e estar ativo.
 - O usuário deve ter permissão para criar estágios.
 
 ## Regras específicas do fluxo
 
-- O fluxo cria um novo estágio.
-- O fluxo usa as regras de domínio definidas em [`internship.md`](lpi-planning/01-entities/internship.md).
-- O estágio é criado inicialmente como ativo quando as datas permitirem isso.
-- O fluxo pode associar opcionalmente um `agentIntegratorId`.
+- O fluxo cria um novo `Internship`.
+- O fluxo cria um novo `InternshipTerm` inicial vinculado ao estágio criado.
+- O fluxo usa as regras de domínio definidas em [`internship.md`](lpi-planning/01-entities/internship.md) e [`internship-term.md`](lpi-planning/01-entities/internship-term.md).
+- O fluxo não deve persistir TCE como entidade separada.
 - O fluxo não deve permitir entrada de agente integrador por texto livre.
+- Quaisquer mudanças futuras nas condições contratuais não devem editar esse termo inicial; devem gerar novo termo conforme o modelo de snapshot.
 
 ## Pós-condições
 
-- Um novo estágio passa a existir e fica vinculado aos registros selecionados.
-- O status do estágio é persistido de forma consistente com as regras de domínio.
+- Um novo estágio passa a existir e fica vinculado ao aluno e à empresa selecionados.
+- Um termo inicial passa a existir com as condições contratuais informadas no TCE.
 
 ## Comportamento esperado na UI
 
 - O front-end usa Step Modal neste fluxo.
-- A UI deve guiar o usuário pela seleção de aluno, empresa, supervisor e dados contratuais.
+- A UI deve guiar o usuário pela seleção de aluno, empresa, supervisor e dados contratuais do termo inicial.
 - A seleção opcional de agente integrador deve estar claramente indicada.
 - Agentes integradores inativos não devem aparecer no dropdown do TCE.
 
@@ -59,4 +73,4 @@ No MVP, TCE não é uma entidade persistida separada. O fluxo cria o próprio es
 
 - Operações de aditivo.
 - Operações de rescisão.
-- Edições estruturais em um estágio já criado fora deste fluxo de criação.
+- Edição de termos já existentes.

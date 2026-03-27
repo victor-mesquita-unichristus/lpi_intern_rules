@@ -4,6 +4,12 @@ Esta alocação foi pensada para 2 estagiários de frontend e 2 estagiários de 
 
 ## Alocação da Sprint 1
 
+**Nota de contexto histórico**
+
+- A alocação da Sprint 1 preserva os cards do recorte original.
+- Ela não deve ser reinterpretada retroativamente pela modelagem baseada em [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
+- Nenhuma distribuição da Sprint 1 nesta página deve ser lida como dependente da modelagem posterior de revisão de termos.
+
 ### Estagiário de Back-end A
 
 - `S1-C01` — Consolidar regras de validação do TCE no backend
@@ -31,7 +37,8 @@ Esta alocação foi pensada para 2 estagiários de frontend e 2 estagiários de 
 
 ### Estagiário de Back-end A
 
-- `S2-C01` — Implementar regras de aditivo no backend
+- `S2-C01` — Implementar criação de termo de aditivo no backend
+- `S2-C02` — Expor operação de aditivo por endpoint/caso de uso dedicado
 
 ### Estagiário de Back-end B
 
@@ -50,7 +57,7 @@ Esta alocação foi pensada para 2 estagiários de frontend e 2 estagiários de 
 ### Oportunidades de pairing
 
 - Fazer pairing entre frontend e backend na integração final do TCE com suporte a agente integrador.
-- Fazer pairing na revisão de validações de aditivo para ajudar o time a entender separação entre domínio e fluxo.
+- Fazer pairing na revisão de validações de aditivo para ajudar o time a entender o modelo de snapshot.
 
 ## Princípios de alocação
 
