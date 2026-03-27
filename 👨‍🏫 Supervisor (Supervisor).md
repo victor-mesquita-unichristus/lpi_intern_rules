@@ -21,6 +21,7 @@
 
 ## Restrições
 
-- Um supervisor não pode ser excluído se estiver vinculado a qualquer estágio.
-- Um supervisor não pode mudar de empresa (`companyId`) se estiver vinculado a estágios ativos.
-- Futuramente, poderá ser possível trocar o supervisor por outro da mesma empresa em um estágio em andamento.
+- Um supervisor não pode ser excluído se estiver vinculado a qualquer `InternshipTerm`.
+- Um supervisor não pode mudar de empresa (`companyId`) se isso quebrar a coerência com termos de estágio já vinculados.
+- O supervisor pertence ao termo, não ao estágio.
+- Mudanças de supervisor em um estágio devem ocorrer por fluxo sobre o termo, e não por mutação direta de `Internship`.

@@ -31,17 +31,21 @@ Ele apenas operacionaliza a modelagem atual:
 - O mecanismo técnico já definido para esse caso é: criar novo snapshot, manter o mesmo `type` do termo revisado e preencher `revisedFromTermId`.
 - O novo termo deve manter o mesmo `type` do termo revisado.
 - O novo termo deve preencher `revisedFromTermId` para marcar a revisão do snapshot anterior.
+- O critério operacional de revisão é o uso do end-point de update do termo vigente.
+- O sistema não deve inferir automaticamente se a operação é revisão ou aditivo a partir do conteúdo alterado.
 - Mudança de empresa não é tratada como edição do estágio. Nessa situação, o estágio atual deve ser encerrado e um novo estágio deve ser criado.
 - `terminationDate` não é tratado neste fluxo e continua pertencendo ao fluxo de rescisão.
 - Após o preenchimento de `terminationDate`, este fluxo não pode gerar novos termos nem revisar termos existentes.
-- `PENDENTE DE DECISÃO`: confirmar quais campos não contratuais de `Internship`, além de `companyId`, podem ser alterados após a criação do vínculo.
-- `PENDENTE DE DECISÃO`: definir o critério operacional para decidir quando uma mudança contratual deve usar este fluxo de revisão e quando deve usar o fluxo formal de aditivo.
+- `studentId` não pode ser alterado após a criação do vínculo.
+- `companyId` não pode ser alterado após a criação do vínculo.
+- Nesta fase, a compatibilidade do contrato principal pode permanecer achatada para criação e leitura principal, desde que o backend preserve internamente a separação entre vínculo e termo.
 
 ## Distinção importante
 
 - O mecanismo técnico de revisão contratual já está definido.
-- O critério operacional para escolher entre revisão contratual e aditivo formal ainda não está totalmente definido.
-- A documentação não deve tratar essa escolha operacional como resolvida enquanto ela permanecer `PENDENTE DE DECISÃO`.
+- O critério operacional para escolher entre revisão contratual e aditivo formal é o fluxo/end-point de origem.
+- End-point de update do termo vigente gera revisão.
+- End-point de aditivo gera `ADDENDUM`.
 
 ## Pós-condições
 
@@ -53,6 +57,7 @@ Ele apenas operacionaliza a modelagem atual:
 - A UI deve separar claramente dados do estágio e dados do termo vigente.
 - A interface não deve transmitir a ideia de edição destrutiva do termo atual.
 - Ações de aditivo e rescisão devem continuar aparecendo como operações separadas.
+- O contrato principal pode permanecer achatado para leitura principal, desde que a UI não trate essa compatibilidade como identidade estrutural do domínio.
 
 ## Fora de escopo
 

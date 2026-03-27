@@ -2,121 +2,120 @@
 
 ## Escopo deste diagnóstico
 
-Este diagnóstico audita a consistência do planejamento em [`lpi-planning/`](lpi-planning) após a adoção da nova modelagem oficial de domínio.
+Este diagnóstico consolida o estado atual do planejamento em [`lpi-planning/`](lpi-planning) após o fechamento das decisões finais da refatoração para o modelo `Internship + InternshipTerm`.
 
-Arquivos centrais revisados nesta consolidação:
+Arquivos centrais considerados nesta consolidação:
 
 - [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
 - [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
+- [`lpi-planning/01-entities/supervisor.md`](lpi-planning/01-entities/supervisor.md)
 - [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
 - [`lpi-planning/02-flows/tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
 - [`lpi-planning/02-flows/amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
 - [`lpi-planning/02-flows/edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
 - [`lpi-planning/02-flows/termination-flow.md`](lpi-planning/02-flows/termination-flow.md)
 - [`lpi-planning/03-cross-cutting/soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
-- [`lpi-planning/06-operational/stories.md`](lpi-planning/06-operational/stories.md)
-- [`lpi-planning/06-operational/cards.md`](lpi-planning/06-operational/cards.md)
-- [`lpi-planning/06-operational/sprints.md`](lpi-planning/06-operational/sprints.md)
-- [`lpi-planning/06-operational/team-allocation.md`](lpi-planning/06-operational/team-allocation.md)
+- [`../TERM_MODEL_REFACTOR_PLAN.md`](../TERM_MODEL_REFACTOR_PLAN.md)
 
-O objetivo é identificar o que foi consolidado, o que ainda apresenta fragilidade de interpretação e o que permanece sem decisão formal.
+O objetivo é registrar o que foi efetivamente consolidado, o que saiu do escopo da implementação atual e quais lacunas reais ainda permanecem.
 
 ## Mudanças consolidadas
 
 ### Estrutura do domínio de estágio
 
-- `Internship` continua sendo a entidade principal do sistema.
 - `Internship` representa a identidade do vínculo entre aluno e empresa.
-- `terminationDate` permanece em `Internship` como parte do ciclo de vida do estágio.
-- `InternshipTerm` passa a representar as condições contratuais por período.
-- Supervisor e agente integrador pertencem ao termo, não ao estágio.
-- Dados contratuais não devem mais existir diretamente em `Internship`.
-- O domínio agora é baseado em snapshots.
-- Alterações de condição não sobrescrevem o termo atual.
-- Alterações de condição devem gerar novo `InternshipTerm`.
-- Revisão de termo não cria novo `type`; mantém `INITIAL` ou `ADDENDUM` e usa `revisedFromTermId` como vínculo de revisão.
+- `InternshipTerm` representa o estado contratual por período.
+- O domínio usa modelo baseado em snapshots.
+- Alterações contratuais não sobrescrevem o termo atual.
+- Alterações contratuais geram novo `InternshipTerm`.
+- Revisão não cria novo `type`; ela mantém `INITIAL` ou `ADDENDUM` e usa `revisedFromTermId`.
 
-### Remoção do modelo antigo de aditivo em `Internship`
+### Imutabilidade do vínculo
 
-- `amendment_start_date` e `amendment_end_date` deixaram de fazer parte do modelo consolidado.
-- Aditivo agora é documentado como criação de novo `InternshipTerm` com `type = ADDENDUM`.
+- `companyId` permanece fixo durante a vida do estágio.
+- `studentId` também é imutável após a criação.
+- Conceitualmente não existe transferência de estágio de um aluno para outro.
 
-### Reposicionamento de supervisor e agente integrador
+### Regras de fluxo entre revisão e aditivo
 
-- O supervisor pertence a `InternshipTerm`.
-- A regra válida é: o supervisor do termo deve pertencer à empresa do estágio.
-- O agente integrador pertence a `InternshipTerm`.
-- Continua proibido texto livre.
-- Histórico deve ser preservado mesmo se o integrador ficar inativo.
+- Aditivo é operação do fluxo/end-point de aditivo.
+- Revisão é operação do end-point de update do termo vigente.
+- O critério entre revisão e aditivo é o fluxo/end-point de origem.
+- O sistema não deve inferir automaticamente essa distinção a partir do conteúdo alterado.
 
-### Reposicionamento dos fluxos principais
+### Rescisão
 
-- TCE não é entidade persistida separada.
-- TCE cria um `Internship` e um `InternshipTerm` inicial.
-- Edição contratual não sobrescreve termo existente.
-- Edição contratual deve gerar novo snapshot em `InternshipTerm`.
-- Mudança de empresa não é edição do estágio; exige encerramento e criação de outro estágio.
-- Rescisão em `Internship` impede criação e revisão de termos.
+- `terminationDate` permanece em `Internship`.
+- A rescisão é definitiva nesta fase.
+- Não existe fluxo de reabertura nesta implementação.
+- Eventual reversão futura, se existir, deverá ser tratada como fluxo específico e controlado, fora do escopo atual.
 
-### Material operacional futuro ajustado ao modelo novo
+### Soft delete
 
-- A Sprint 2 e o planejamento posterior já podem refletir a modelagem com [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
-- A Sprint 1 foi preservada como registro histórico do escopo original e não deve ser lida como reescrita retroativa do novo modelo.
+- `Internship` usa `deletedAt`.
+- `InternshipTerm` usa `deletedAt`.
+- Perda de vigência lógica por revisão não se confunde com `deletedAt`.
+- Termos revisados não devem ser deletados; apenas deixam de ser vigentes.
+
+### Escopo da implementação atual
+
+- `placementAgency` permanece como campo legado `string nullable` em `InternshipTerm`.
+- `AgentIntegrator` não entra nesta implementação.
+- Não é necessária estratégia de migração complexa de dados legados.
+- Pode-se assumir reset de banco e reconstrução na nova estrutura.
+- O fluxo de aditivo não entra na sprint atual.
+- Nesta fase, apenas a estrutura necessária para suportar aditivo futuramente deve ser preparada.
+
+### Contrato de leitura e compatibilidade
+
+- O contrato principal de criação e leitura pode permanecer achatado, compatível com o modelo atual sempre que possível.
+- Essa compatibilidade não altera a separação estrutural entre `Internship` e `InternshipTerm`.
+- O backend pode expor um endpoint adicional de histórico: `getTermsByInternId`.
+- Esse endpoint deve retornar a lista de termos ordenada temporalmente.
 
 ## Riscos e fragilidades remanescentes
 
-### [`tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
+### Contrato público achatado
 
-- O enquadramento atual está correto, mas depende de leitura disciplinada em conjunto com [`internship.md`](lpi-planning/01-entities/internship.md) e [`internship-term.md`](lpi-planning/01-entities/internship-term.md).
-- Se o time tratar o fluxo como fonte primária de regra temporal, há risco de voltar a misturar entidade e fluxo.
+- A compatibilidade temporária reduz impacto imediato no frontend.
+- O risco remanescente é confundir shape de API com modelo interno do domínio.
+- A documentação precisa continuar explícita em separar contrato principal compatível e modelagem interna nova.
 
-### [`amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
+### Histórico de termos
 
-- O fluxo já está alinhado ao modelo de snapshot.
-- Ainda existe risco de implementação confundir aditivo formal com edição contratual genérica, porque ambos agora geram novos termos.
-- Esse risco aumentou com a introdução de `revisedFromTermId`, porque a distinção entre revisão e aditivo depende de disciplina de fluxo, não de um novo `type`.
+- O endpoint adicional de histórico melhora a legibilidade do modelo.
+- O ponto sensível remanescente é garantir consistência entre leitura principal achatada e leitura histórica ordenada.
 
-### [`edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
+### Fluxo de aditivo fora de escopo da sprint
 
-- O enquadramento está mais correto, mas continua sensível a interpretação.
-- Sem definição operacional mais precisa, o time pode divergir sobre quando criar novo termo com o mesmo `type` e quando tratar a mudança como aditivo formal.
-- Também permanece sensível a erro de leitura sobre elegibilidade de revisão, porque a revisão só é permitida para o termo vigente.
+- A decisão reduz escopo da entrega atual.
+- O risco remanescente é implementar a estrutura de termos de modo insuficiente para suportar `ADDENDUM` depois.
+- Por isso, o tipo e a modelagem do termo já precisam nascer compatíveis com aditivo, mesmo sem fluxo entregue agora.
 
-### [`termination-flow.md`](lpi-planning/02-flows/termination-flow.md)
+### `AgentIntegrator` fora desta implementação
 
-- A regra central está clara.
-- Ainda há fragilidade caso implementação ou planejamento futuro tentem introduzir reabertura sem decisão formal, porque isso impactaria fluxo, invariantes e histórico.
+- A decisão reduz a complexidade imediata.
+- O risco remanescente é o time esquecer que `placementAgency` é apenas legado transitório e tratá-lo como solução final.
 
-### [`soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
+### Soft delete parcial no sistema
 
-- A direção transversal ficou mais clara.
-- O ponto frágil remanescente é a baixa confirmação formal por entidade, o que ainda exige cuidado para não transformar direção em verdade implementada.
-
-### [`internship-term.md`](lpi-planning/01-entities/internship-term.md)
-
-- O modelo de revisão ficou mais preciso com `revisedFromTermId`.
-- Ainda existe fragilidade de interpretação operacional sobre o que conta como termo válido em consultas e validações, porque isso depende da leitura conjunta de soft delete e substituição por revisão.
-
-### Artefatos operacionais
-
-- O principal risco anterior era reescrever retroativamente a Sprint 1 com a modelagem nova.
-- Esse risco foi corrigido, mas precisa continuar explícito para evitar novas retrointerpretações do histórico do projeto.
-- O material operacional agora exige leitura temporal: Sprint 1 como registro histórico; Sprint 2 em diante como planejamento já influenciado pelo modelo novo.
+- `Internship` e `InternshipTerm` já estão decididos com `deletedAt`.
+- Ainda existe dependência de futuras confirmações para outras entidades do sistema.
+- Esse ponto continua exigindo disciplina para não generalizar prematuramente o padrão como se estivesse consolidado em todo o domínio.
 
 ## Pendências reais
 
 Os pontos abaixo continuam sem decisão formal completa:
 
-- `PENDENTE DE DECISÃO`: se `Internship` já usa oficialmente `deletedAt` no modelo persistido.
-- `PENDENTE DE DECISÃO`: se `InternshipTerm` já usa oficialmente `deletedAt` no modelo persistido.
-- `PENDENTE DE DECISÃO`: se Empresa, Aluno, Supervisor, Usuário e Curso já estão consolidados com `deletedAt`.
-- `PENDENTE DE DECISÃO`: se `studentId` pode ou não ser alterado após a criação de `Internship`.
-- `PENDENTE DE DECISÃO`: qual é o critério operacional para decidir quando uma alteração contratual fora do aditivo formal mantém o mesmo `type` no novo snapshot.
-- `PENDENTE DE DECISÃO`: se existe política oficial de reabertura após rescisão.
-- `PENDENTE DE DECISÃO`: se a revisão de termo exigirá justificativa obrigatória em versões futuras ou permanecerá opcional.
+- `PENDENTE DE DECISÃO`: se Empresa já está oficialmente consolidada com `deletedAt`.
+- `PENDENTE DE DECISÃO`: se Aluno já está oficialmente consolidado com `deletedAt`.
+- `PENDENTE DE DECISÃO`: se Supervisor já está oficialmente consolidado com `deletedAt`.
+- `PENDENTE DE DECISÃO`: se Usuário já está oficialmente consolidado com `deletedAt`.
+- `PENDENTE DE DECISÃO`: se Curso já está oficialmente consolidado com `deletedAt`.
 
 ## Resumo do diagnóstico
 
 - A mudança estrutural principal foi consolidada.
-- O risco restante não está mais na direção do modelo, mas na disciplina de interpretação entre histórico do projeto, regras de entidade e fluxos operacionais.
-- As maiores fragilidades remanescentes estão em soft delete, edição contratual fora do aditivo formal e eventual política de reabertura após rescisão.
+- As pendências centrais de `deletedAt`, imutabilidade de `studentId`, critério entre revisão e aditivo e política de reabertura deixaram de estar em aberto.
+- O escopo atual foi simplificado de forma explícita: `AgentIntegrator` fica fora, `placementAgency` permanece legado, aditivo fica fora da sprint, e o contrato principal pode permanecer achatado temporariamente.
+- As lacunas reais remanescentes estão concentradas principalmente na consolidação de soft delete em outras entidades do sistema.

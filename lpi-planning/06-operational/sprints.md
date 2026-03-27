@@ -34,6 +34,7 @@ Cada sprint possui agora seu próprio diretório com os seguintes arquivos:
 - Histórias: [`lpi-planning/06-operational/sprint-2/stories.md`](lpi-planning/06-operational/sprint-2/stories.md)
 - Cards: [`lpi-planning/06-operational/sprint-2/cards.md`](lpi-planning/06-operational/sprint-2/cards.md)
 - Alocação: [`lpi-planning/06-operational/sprint-2/team-allocation.md`](lpi-planning/06-operational/sprint-2/team-allocation.md)
+- Enquadramento: sprint de refatoração estrutural do domínio de estágio, com balanceamento explícito entre backend e frontend.
 
 ## Trilha posterior recomendada
 

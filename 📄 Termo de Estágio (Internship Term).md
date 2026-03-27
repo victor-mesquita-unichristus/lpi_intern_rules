@@ -1,19 +1,19 @@
-# Termo de Estágio
+# 📄 Termo de Estágio (Internship Term)
 
 ## Propósito
 
-`InternshipTerm` representa as condições contratuais do estágio ao longo do tempo.
+`InternshipTerm` representa as condições contratuais de um estágio em um período específico.
 
 O modelo é baseado em snapshots:
 
 - o histórico é imutável
 - cada termo representa um recorte contratual válido por período
-- alterações contratuais geram novos termos, e não sobrescrita do termo atual
+- alterações contratuais geram novos termos, sem sobrescrever o termo anterior
 
 ## Princípio central
 
-- `Internship` representa a identidade do vínculo.
-- `InternshipTerm` representa as condições contratuais por período.
+- `Internship` representa a identidade do vínculo
+- `InternshipTerm` representa as condições contratuais por período
 
 ## Campos
 
@@ -51,19 +51,19 @@ O modelo é baseado em snapshots:
 - Não pode haver sobreposição entre termos válidos do mesmo estágio.
 - Após o preenchimento de `terminationDate` em `Internship`, não podem ser criados novos termos.
 
-## Leitura operacional de termos válidos
+## Termos válidos e termo vigente
 
-Para efeito de validação e leitura operacional, considerar como válidos os termos que:
+Para leitura operacional, considerar como válidos os termos que:
 
-- não estejam removidos logicamente; e
-- não tenham sido substituídos por um termo de revisão posterior.
+- não estejam removidos logicamente
+- não tenham sido substituídos por um termo de revisão posterior
 
-`createdAt` não define cronologia de negócio. A coerência temporal deve ser analisada com base em `startDate`, `endDate` e no conjunto de termos válidos do mesmo estágio.
+Regras adicionais:
 
-## Definição de termo vigente
-
+- `createdAt` não define cronologia de negócio.
+- A coerência temporal deve ser analisada com base em `startDate`, `endDate` e no conjunto de termos válidos do mesmo estágio.
 - Termo vigente é o termo válido mais recente na linha temporal do estágio.
-- Termo vigente não se confunde com termo válido: pode existir mais de um termo válido no histórico, mas apenas um termo vigente por estágio em cada momento de leitura operacional.
+- Pode existir mais de um termo válido no histórico, mas apenas um termo vigente por estágio em cada momento de leitura operacional.
 
 ## Regra de snapshot
 
@@ -85,19 +85,11 @@ Para efeito de validação e leitura operacional, considerar como válidos os te
 
 ## Permissão e elegibilidade de revisão
 
-- Qualquer usuário com permissão de edição do fluxo pode revisar o termo.
 - Um termo só pode ser revisado enquanto for o termo vigente do estágio.
 - Se já existir outro termo válido posterior, o termo anterior deixa de ser vigente e não pode mais ser revisado.
 - Revisões sucessivas formam uma cadeia sobre o termo vigente mais recente, e não sobre termos históricos já substituídos.
 - Após o preenchimento de `terminationDate` em `Internship`, não pode haver revisão de termos.
-- Justificativa de revisão é opcional nesta fase.
-
-## Regras de revisão por tipo
-
-- Revisão de termo `INITIAL` gera novo termo com `type = INITIAL`.
-- Revisão de termo `ADDENDUM` gera novo termo com `type = ADDENDUM`.
-- Ao revisar um termo `INITIAL`, `startDate` e `endDate` podem ser ajustados, desde que a linha temporal do estágio seja preservada e não haja sobreposição com termos válidos posteriores.
-- Ao revisar um termo `ADDENDUM`, `startDate` e `endDate` podem ser ajustados, desde que a sequência temporal do estágio seja preservada e não haja sobreposição com outros termos válidos.
+- Justificativa de revisão é desejável, mas não obrigatória no MVP.
 
 ## Regras por tipo
 
@@ -105,6 +97,10 @@ Para efeito de validação e leitura operacional, considerar como válidos os te
 - O endpoint de aditivo cria um `InternshipTerm` com `type = ADDENDUM`.
 - O endpoint de update do termo vigente cria revisão e mantém o `type` do termo revisado.
 - O critério entre aditivo e revisão é o fluxo/end-point de origem, e não inferência automática.
+- Revisão de termo `INITIAL` gera novo termo com `type = INITIAL`.
+- Revisão de termo `ADDENDUM` gera novo termo com `type = ADDENDUM`.
+- Ao revisar um termo `INITIAL`, `startDate` e `endDate` podem ser ajustados, desde que a linha temporal do estágio seja preservada e não haja sobreposição com termos válidos posteriores.
+- Ao revisar um termo `ADDENDUM`, `startDate` e `endDate` podem ser ajustados, desde que a sequência temporal do estágio seja preservada e não haja sobreposição com outros termos válidos.
 
 ## Relacionamentos
 

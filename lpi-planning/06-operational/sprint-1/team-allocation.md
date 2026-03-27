@@ -6,6 +6,11 @@
 - Ela não deve ser reinterpretada retroativamente pela modelagem baseada em [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
 - Nenhuma distribuição desta sprint nesta página deve ser lida como dependente da modelagem posterior de revisão de termos.
 
+## Observação posterior de escopo
+
+- Esta alocação continua sendo apenas registro histórico.
+- As decisões posteriores que retiram `AgentIntegrator` e o fluxo de aditivo do escopo da implementação atual não reescrevem esta distribuição retroativamente.
+
 ## Distribuição sugerida
 
 ### Estagiário de Back-end A

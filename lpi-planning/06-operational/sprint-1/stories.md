@@ -6,6 +6,12 @@
 - Ela antecede a modelagem baseada em [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
 - Portanto, as histórias abaixo não devem ser reinterpretadas como fonte de verdade do modelo atual.
 
+## Observação posterior de escopo
+
+- As histórias abaixo permanecem como registro histórico.
+- Na implementação atual, `AgentIntegrator` não entra em escopo e `placementAgency` permanece como legado transitório.
+- O fluxo de aditivo também não entra na sprint atual de implementação, embora a estrutura necessária para suportá-lo futuramente continue válida como direção de arquitetura.
+
 ## Histórias
 
 ### S1-US-01 — Criar estágio pelo fluxo de TCE

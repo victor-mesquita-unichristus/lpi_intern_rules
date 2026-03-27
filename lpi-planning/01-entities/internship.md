@@ -7,14 +7,14 @@
 Ela representa:
 
 - o vínculo entre aluno e empresa
-- a identidade do estágio
-- o ciclo de vida do estágio, incluindo rescisão
+- a identidade persistida do estágio
+- o ciclo de vida do estágio, incluindo rescisão e exclusão lógica
 
 ## Princípio central
 
 - `Internship` representa a identidade do vínculo.
 - `InternshipTerm` representa as condições contratuais por período.
-- `Internship` não deve mais armazenar dados contratuais variáveis.
+- `Internship` não armazena dados contratuais variáveis.
 
 ## Papel no domínio
 
@@ -22,7 +22,7 @@ Ela representa:
 - É nela que o sistema reconhece a existência contínua do vínculo entre aluno e empresa.
 - Os termos contratuais podem mudar ao longo do tempo, mas continuam pertencendo ao mesmo `Internship` enquanto o vínculo permanecer o mesmo.
 - A separação entre vínculo e condições contratuais é estrutural, não apenas organizacional.
-- `Internship` concentra a identidade persistida que amarra aluno, empresa, termos válidos e rescisão dentro do mesmo ciclo de vida.
+- `Internship` concentra a identidade persistida que amarra aluno, empresa, termos válidos, rescisão e exclusão lógica dentro do mesmo ciclo de vida.
 
 ## Campos
 
@@ -32,15 +32,20 @@ Ela representa:
 - `terminationDate` (`nullable`)
 - `createdAt`
 - `updatedAt`
-- `deletedAt` (`PENDENTE DE DECISÃO`: confirmar consolidação no modelo persistido)
+- `deletedAt` (`nullable`)
 
 ## Regras
 
 - A empresa permanece fixa no estágio.
+- `studentId` não pode ser alterado após a criação do estágio.
+- Conceitualmente não existe transferência de estágio de um aluno para outro.
 - Se houver necessidade de mudar a empresa, o estágio atual deve ser encerrado e um novo estágio deve ser criado.
-- `Internship` não contém mais supervisor, agente integrador, datas contratuais, remuneração, carga horária nem campos de aditivo.
+- `Internship` não contém supervisor, `placementAgency`, datas contratuais, remuneração, carga horária nem campos de aditivo.
 - `terminationDate`, quando preenchido, representa a rescisão do estágio.
+- Nesta fase, a rescisão é definitiva.
 - Após a rescisão, o estágio é encerrado e não pode receber novos termos.
+- Após a rescisão, o estágio não pode receber revisão de termos.
+- A exclusão do estágio é lógica por meio de `deletedAt`.
 - A linha temporal contratual do estágio é formada pelo conjunto de termos válidos vinculados a ele.
 - A coerência temporal do estágio depende da ausência de sobreposição entre termos válidos do mesmo vínculo.
 - Um aluno não pode manter períodos de estágio sobrepostos, mesmo quando esses períodos pertençam a estágios diferentes.
@@ -52,6 +57,7 @@ Ela representa:
 - A evolução contratual ocorre por novos registros em `InternshipTerm`.
 - A rescisão encerra o ciclo de vida do estágio sem apagar seu histórico.
 - Depois da rescisão, o estágio preserva histórico, mas não admite novos termos nem revisão de termos existentes.
+- A exclusão lógica remove o estágio das listagens padrão sem apagar seu histórico persistido.
 
 ## Relacionamentos
 
@@ -67,6 +73,7 @@ Ela representa:
 - A continuidade contratual do estágio é registrada exclusivamente em `InternshipTerm`.
 - Não podem existir campos contratuais diretos em `Internship`.
 - A empresa é fixa durante toda a vida do estágio.
+- `studentId` é imutável após a criação do vínculo.
 - Todos os termos do estágio pertencem ao mesmo vínculo entre aluno e empresa.
 - Não pode haver sobreposição entre termos válidos do mesmo estágio.
 - Não pode haver sobreposição entre períodos de estágio do mesmo aluno no domínio, ainda que pertencentes a vínculos distintos.
@@ -74,9 +81,10 @@ Ela representa:
 - Um estágio rescindido não pode receber revisão de termos.
 - A existência de termos não substitui nem redefine a identidade do estágio.
 - `amendment_start_date` e `amendment_end_date` não fazem mais parte do domínio.
+- `deletedAt` não substitui rescisão; ele apenas representa exclusão lógica.
 
 ## Observações
 
 - TCE não é entidade persistida separada.
 - No fluxo de TCE, o sistema cria um `Internship` e um `InternshipTerm` inicial.
-- `PENDENTE DE DECISÃO`: confirmar se `studentId` pode ou não ser alterado após a criação do estágio. A modelagem oficial consolidou explicitamente a imutabilidade da empresa, mas não formalizou este ponto para o aluno.
+- A compatibilidade temporária de contrato achatado na API não altera a separação estrutural entre `Internship` e `InternshipTerm`.
