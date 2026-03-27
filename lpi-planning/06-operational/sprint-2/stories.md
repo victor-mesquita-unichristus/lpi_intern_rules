@@ -1,54 +1,84 @@
 # Histórias da Sprint 2
 
-## Histórias
+## Histórias operacionais
 
-### S2-US-01 — Registrar aditivo criando novo termo de estágio
+### S2-US-01 — Refatorar a persistência do estágio para `Internship` + `InternshipTerm`
 
-Como usuário administrativo, eu quero registrar um aditivo para um estágio para que as novas condições contratuais sejam armazenadas sem sobrescrever o histórico.
+Como time de engenharia, precisamos migrar a persistência do estágio para o modelo novo para que a base de dados e os fluxos deixem de depender do modelo contratual antigo em [`Internship`](lpi-planning/01-entities/internship.md).
 
 **Critérios de aceite**
 
-- O fluxo de aditivo cria um novo `InternshipTerm` com `type = ADDENDUM`.
-- O fluxo não altera campos contratuais diretamente em `Internship`.
-- O termo anterior permanece imutável.
-- O novo termo deve respeitar continuidade temporal e não pode se sobrepor aos termos já existentes.
+- A estrutura persistida de [`InternshipTerm`](lpi-planning/01-entities/internship-term.md) existe e está integrada ao fluxo de estágio.
+- O backend deixa de depender operacionalmente dos campos contratuais antigos em [`Internship`](lpi-planning/01-entities/internship.md).
+- Supervisor passa a ser lido e escrito no termo.
+- As migrações necessárias estão definidas.
 
 **Dependências**
 
 - [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
 - [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
+
+### S2-US-02 — Refatorar domínio, casos de uso e leitura do termo vigente
+
+Como time de engenharia, precisamos adaptar o domínio e os casos de uso de estágio para que o sistema opere corretamente com snapshots contratuais e leitura do termo vigente.
+
+**Critérios de aceite**
+
+- Casos de uso e services impactados passam a operar com [`Internship`](lpi-planning/01-entities/internship.md) + [`InternshipTerm`](lpi-planning/01-entities/internship-term.md).
+- A leitura operacional de estágio considera apenas o termo vigente quando necessário para resposta do sistema.
+- O fluxo de TCE cria estágio e termo inicial de forma consistente.
+- O fluxo de aditivo cria novo termo do tipo `ADDENDUM` sem sobrescrita do histórico.
+
+**Dependências**
+
+- [`lpi-planning/02-flows/tce-flow.md`](lpi-planning/02-flows/tce-flow.md)
 - [`lpi-planning/02-flows/amendment-flow.md`](lpi-planning/02-flows/amendment-flow.md)
+- [`lpi-planning/02-flows/edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
 
-### S2-US-02 — Gerenciar agentes integradores
+### S2-US-03 — Refatorar testes e seeds para a nova modelagem
 
-Como usuário administrativo, eu quero cadastrar e manter agentes integradores para que os termos de estágio possam referenciá-los estruturalmente, em vez de texto livre.
-
-**Critérios de aceite**
-
-- O cadastro de agente integrador usa apenas o conjunto atual de campos do MVP.
-- Nomes ativos são únicos.
-- A exclusão segue a direção de soft delete por meio de `deletedAt`.
-- Agentes integradores excluídos não aparecem em contextos padrão de seleção.
-- O detalhe histórico continua exibindo agentes integradores já vinculados a termos existentes.
-
-**Dependências**
-
-- [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
-- [`lpi-planning/03-cross-cutting/soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
-
-### S2-US-03 — Associar agente integrador opcional no TCE
-
-Como usuário administrativo, eu quero selecionar opcionalmente um agente integrador durante o TCE para que o termo inicial reflita a participação do intermediador quando ela existir.
+Como time de engenharia, precisamos adaptar testes e seeds para que a nova modelagem tenha cobertura e ambiente consistente de execução.
 
 **Critérios de aceite**
 
-- A associação de agente integrador é opcional no TCE.
-- O fluxo armazena o relacionamento por meio de `agentIntegratorId` em `InternshipTerm`.
-- A seleção do TCE não mostra agentes integradores inativos.
-- Não é permitida entrada de agente integrador por texto livre.
+- Testes de entidades impactadas são atualizados.
+- Testes de services, features e integração são atualizados.
+- Seeds passam a refletir o modelo com termo de estágio.
 
 **Dependências**
 
-- [`lpi-planning/01-entities/agent-integrator.md`](lpi-planning/01-entities/agent-integrator.md)
+- [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
+- [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
+
+### S2-US-04 — Adaptar contratos e fluxos do frontend ao termo vigente
+
+Como time de frontend, precisamos adaptar contratos, tipagens e telas para que a interface continue funcional no modelo novo sem expor histórico de termos.
+
+**Critérios de aceite**
+
+- O frontend consome o novo payload e resposta do TCE.
+- O detalhe do estágio exibe apenas o termo vigente.
+- A tela separa dados do vínculo e dados do termo vigente.
+- A estrutura visual fica preparada para histórico futuro sem expor histórico nesta sprint.
+- Tipagens e mapeamentos afetados pela nova modelagem são corrigidos.
+- A interface não tenta exibir histórico de termos nesta sprint.
+
+### S2-US-05 — Prototipar e consolidar a nova estrutura visual do detalhe do estágio
+
+Como time de frontend, precisamos validar rapidamente a estrutura visual da nova tela para reduzir retrabalho durante a implementação da separação entre vínculo e termo vigente.
+
+**Critérios de aceite**
+
+- Existe um protótipo funcional da estrutura da tela de detalhe.
+- O protótipo é usado como referência direta de implementação ainda nesta sprint.
+- A atividade permanece limitada a alinhamento estrutural e UX da tela, sem abrir uma fase paralela de refinamento estético.
+
+**Dependências**
+
+- [`lpi-planning/01-entities/internship.md`](lpi-planning/01-entities/internship.md)
+- [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
+
+**Dependências**
+
 - [`lpi-planning/01-entities/internship-term.md`](lpi-planning/01-entities/internship-term.md)
 - [`lpi-planning/02-flows/tce-flow.md`](lpi-planning/02-flows/tce-flow.md)

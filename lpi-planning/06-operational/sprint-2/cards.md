@@ -1,84 +1,97 @@
 # Cards da Sprint 2
 
-## Cards
+## Blocos de execução
 
-### S2-C01 — Implementar criação de termo de aditivo no backend
-
-- Tipo: Back-end
-- História: `S2-US-01`
-- Escopo:
-  - criar novo `InternshipTerm` com `type = ADDENDUM`
-  - validar continuidade temporal
-  - preservar histórico sem sobrescrita
-
-### S2-C02 — Expor operação de aditivo por endpoint/caso de uso dedicado
+### S2-C01 — Criar persistência de `InternshipTerm` e migrations
 
 - Tipo: Back-end
 - História: `S2-US-01`
 - Escopo:
-  - criar operação dedicada de aditivo
-  - mantê-la separada da edição genérica de estágio
+  - criar a estrutura persistida de [`InternshipTerm`](lpi-planning/01-entities/internship-term.md)
+  - definir migrations da nova modelagem
+  - remover dependência operacional dos campos contratuais antigos em [`Internship`](lpi-planning/01-entities/internship.md)
 
-### S2-C03 — Construir fluxo de UI para aditivo
-
-- Tipo: Front-end
-- História: `S2-US-01`
-- Escopo:
-  - renderizar campos do novo termo
-  - exibir histórico prévio como referência
-  - exibir feedback de validação de continuidade temporal
-
-### S2-C04 — Implementar persistência de Agente Integrador e comportamento de soft delete
+### S2-C02 — Refatorar domínio de estágio e leitura do termo vigente
 
 - Tipo: Back-end
 - História: `S2-US-02`
 - Escopo:
-  - implementar regras de cadastro
-  - preservar vínculo histórico com termos
-  - ocultar registros inativos nos casos de uso padrão de seleção
+  - adaptar domínio e services de estágio
+  - mover supervisor para o termo
+  - consolidar leitura do termo vigente
 
-### S2-C05 — Construir telas de gerenciamento de Agente Integrador
+### S2-C03 — Refatorar casos de uso e contratos de TCE e aditivo no backend
 
-- Tipo: Front-end
+- Tipo: Back-end
 - História: `S2-US-02`
 - Escopo:
-  - criar interações de lista e formulário
-  - ocultar registros inativos no contexto padrão de listagem, quando aplicável
-  - expor ação de exclusão de forma consistente com o comportamento de soft delete
+  - ajustar criação de TCE para `Internship` + termo inicial
+  - ajustar operação de aditivo para criação de novo termo
+  - alinhar payloads e respostas consumidos pelo frontend
 
-### S2-C06 — Adicionar seleção opcional de Agente Integrador na UI do TCE
-
-- Tipo: Front-end
-- História: `S2-US-03`
-- Escopo:
-  - adicionar controle estruturado de seleção no termo inicial
-  - impedir entrada por texto livre
-  - excluir opções inativas
-
-### S2-C07 — Adicionar suporte a Agente Integrador no contrato de TCE do backend
+### S2-C04 — Refatorar testes da nova modelagem no backend
 
 - Tipo: Back-end
 - História: `S2-US-03`
 - Escopo:
-  - aceitar `agentIntegratorId` opcional em `InternshipTerm`
-  - validar existência ativa antes da associação
+  - atualizar testes de entidades impactadas
+  - atualizar testes de services e features
+  - atualizar testes de integração
 
-## Cards pendentes relacionados à trilha posterior
+### S2-C05 — Adaptar seeds para a nova estrutura de estágio
 
-### PEND-C01 — Consolidar persistência de soft delete em `Internship` e `InternshipTerm`
+- Tipo: Back-end
+- História: `S2-US-03`
+- Escopo:
+  - adaptar seeds ao modelo com [`Internship`](lpi-planning/01-entities/internship.md) + [`InternshipTerm`](lpi-planning/01-entities/internship-term.md)
+  - garantir consistência mínima para ambientes de desenvolvimento e testes
+
+### S2-C06 — Refatorar tipagens e contratos do frontend
+
+- Tipo: Front-end
+- História: `S2-US-04`
+- Escopo:
+  - adaptar tipagens ao novo modelo
+  - corrigir mapeamentos afetados
+  - alinhar consumo dos contratos novos
+
+### S2-C07 — Adaptar TCE no frontend para o novo payload e resposta
+
+- Tipo: Front-end
+- História: `S2-US-04`
+- Escopo:
+  - ajustar submissão do TCE
+  - ajustar leitura da resposta do backend
+  - manter o fluxo compatível com o termo inicial
+
+### S2-C08 — Ajustar detalhe do estágio para exibir apenas o termo vigente
+
+- Tipo: Front-end
+- História: `S2-US-04`
+- Escopo:
+  - exibir apenas o termo vigente na interface
+  - não expor histórico de termos nesta sprint
+  - corrigir renderização dos dados contratuais derivados do termo
+
+### S2-C09 — Prototipar estrutura funcional da nova tela de detalhe
+
+- Tipo: Front-end
+- História: `S2-US-05`
+- Escopo:
+  - prototipar a separação entre vínculo e termo vigente
+  - usar o protótipo como referência direta de implementação
+  - limitar a atividade a estrutura e UX funcional da tela
+
+## Itens dependentes de decisões posteriores
+
+### PEND-C01 — Definir fluxo operacional de revisão contratual no produto
+
+- Tipo: Produto + Back-end + Front-end
+- Depende de: [`edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
+- Status: `PENDENTE DE DECISÃO`
+
+### PEND-C02 — Consolidar soft delete completo em entidades restantes
 
 - Tipo: Back-end
 - Depende de: [`soft-delete.md`](lpi-planning/03-cross-cutting/soft-delete.md)
-- Status: `PENDENTE DE DECISÃO`
-
-### PEND-C02 — Definir campos não contratuais editáveis em `Internship`
-
-- Tipo: Produto + Back-end + Front-end
-- Depende de: [`edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
-- Status: `PENDENTE DE DECISÃO`
-
-### PEND-C03 — Definir fluxo operacional para edição contratual por snapshot fora do aditivo formal
-
-- Tipo: Produto + Back-end + Front-end
-- Depende de: [`edit-internship-flow.md`](lpi-planning/02-flows/edit-internship-flow.md)
 - Status: `PENDENTE DE DECISÃO`
